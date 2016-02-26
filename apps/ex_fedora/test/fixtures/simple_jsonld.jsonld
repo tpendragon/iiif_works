@@ -1,0 +1,7 @@
+[
+  {
+    "@id": "http://test.com",
+    "@type": "http://type.com",
+    "http://mypredicate.com": "my value"
+  }
+]
