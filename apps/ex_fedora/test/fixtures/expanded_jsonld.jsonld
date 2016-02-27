@@ -1,0 +1,59 @@
+[
+  {
+    "@id": "http://bibdata.princeton.edu/bibliographic/1234567",
+    "http://purl.org/dc/elements/1.1/contributor": [
+      {
+        "@value": "Copland, Aaron, 1900-1990"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/creator": [
+      {
+        "@value": "Isherwood, Christopher, 1904-1986"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/date": [
+      {
+        "@value": "1976"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/description": [
+      {
+        "@value": "339 p. ; 22 cm."
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/format": [
+      {
+        "@value": "Book"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/language": [
+      {
+        "@value": "eng"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/publisher": [
+      {
+        "@value": "New York : Farrar, Straus Giroux, 1976."
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/subject": [
+      {
+        "@value": "Isherwood, Christopher, 1904-1986"
+      },
+      {
+        "@value": "Authors, English—20th century—Biography"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Christopher",
+        "@language": "eng"
+      }
+    ],
+    "http://purl.org/dc/terms/created": [
+      {
+        "@value": "1976-01-01T00:00:00Z"
+      }
+    ]
+  }
+]

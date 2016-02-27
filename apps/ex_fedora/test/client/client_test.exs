@@ -15,7 +15,7 @@ defmodule ExFedoraClientTest do
 
 
   test "post to create RDF source", %{client: client} do
-    {result, response} = Client.post(client, "", :rdf_source, [])
+    {_, response} = Client.post(client, "", :rdf_source, [])
     assert response.status_code == 201
     assert response.headers.location
   end
@@ -23,10 +23,9 @@ defmodule ExFedoraClientTest do
   test "get an ID", %{client: client} do
     {_, %{headers: %{location: location}}} = Client.post(client, "")
     "http://localhost:8984/rest/" <> id = location
-    {result, response} = Client.get(client, id)
+    {_, response} = Client.get(client, id)
 
     assert response.statements
-    IEx.pry
-    assert length(response.statements) == 1
+    assert length(response.statements) == 13
   end
 end
