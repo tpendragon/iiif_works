@@ -1,6 +1,6 @@
 [
   {
-    "@id": "http://bibdata.princeton.edu/bibliographic/1234567",
+    "@id": "http://test.com",
     "http://purl.org/dc/elements/1.1/contributor": [
       {
         "@value": "Copland, Aaron, 1900-1990"
@@ -9,6 +9,9 @@
     "http://purl.org/dc/elements/1.1/creator": [
       {
         "@value": "Isherwood, Christopher, 1904-1986"
+      },
+      {
+        "@id": "http://me.com"
       }
     ],
     "http://purl.org/dc/elements/1.1/date": [

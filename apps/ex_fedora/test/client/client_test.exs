@@ -1,6 +1,6 @@
 require IEx
 defmodule ExFedoraClientTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest ExFedora.Client
   alias ExFedora.Client
 
@@ -26,6 +26,6 @@ defmodule ExFedoraClientTest do
     {_, response} = Client.get(client, id)
 
     assert response.statements
-    assert length(response.statements) == 13
+    assert RDF.Graph.size(response.statements) == 13
   end
 end
