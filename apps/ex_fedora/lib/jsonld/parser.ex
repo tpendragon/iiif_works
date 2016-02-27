@@ -1,6 +1,5 @@
-require IEx
 defmodule JSONLD.Parser do
-  alias JSONLD.Literal
+  alias RDF.Literal
   def extract_statements(list) do
     list
     |> build_dataset

@@ -1,0 +1,6 @@
+<http://test.com> <http://predicate.com> "Fred's Phone"@en .
+<http://test.com> <http://predicate.com> "Fred's Other Phone"@en .
+<http://test.com> <http://predicate.com> "Fred's Third Phone"@en .
+<http://test.com> <http://predicate.com/2> "Fred's Tablet"@en .
+<http://test.com/2> <http://predicate.com> "Fred's Stuff"@en .
+<http://test.com/3> <http://predicate.com> <http://mystuff.com> .

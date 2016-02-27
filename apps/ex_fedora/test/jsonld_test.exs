@@ -1,7 +1,7 @@
 defmodule JSONLDTest do
   use ExUnit.Case, async: true
   doctest JSONLD
-  alias JSONLD.Literal
+  alias RDF.Literal
 
   test "returns a dataset" do
     {:ok, fixture_1} = File.read("test/fixtures/simple_jsonld.jsonld")
