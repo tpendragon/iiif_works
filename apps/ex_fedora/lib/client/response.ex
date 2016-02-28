@@ -14,6 +14,10 @@ defmodule ExFedora.Client.Response do
     JSONLD.parse(body)
   end
 
+  defp parse_graph(body, "application/n-triples") do
+    NTriples.parse(body)
+  end
+
   defp parse_graph(body, content_type) do
     []
   end

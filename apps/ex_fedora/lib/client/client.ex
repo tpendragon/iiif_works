@@ -8,7 +8,7 @@ defmodule ExFedora.Client do
   end
 
   defp parse_body(:rdf_source, body) do
-    Poison.encode!(%{})
+    ""
   end
 
   defp parse_body(type, body) do
@@ -17,7 +17,7 @@ defmodule ExFedora.Client do
 
   defp headers(:rdf_source) do
     [
-      "content-type": "application/ld+json"
+      "content-type": "application/n-triples"
     ]
   end
 
