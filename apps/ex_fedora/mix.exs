@@ -39,8 +39,9 @@ defmodule ExFedora.Mixfile do
     [
       {:httpoison, "~> 0.8.0"},
       {:poison, "~> 2.0"},
-      {:benchwarmer, "~> 0.0.2"},
-      {:exprof, "~> 0.2.0"}
+      {:benchwarmer, "~> 0.0.2", only: [:dev, :test]},
+      {:benchfella, "~> 0.3.0", only: [:dev, :test]},
+      {:exprof, "~> 0.2.0", only: [:dev, :test]}
     ]
   end
 end

@@ -37,7 +37,7 @@ defmodule NTriples.Parser do
   defp append_triple(map, {subject, predicate, object}) do
     case map do
       %{^subject => %{^predicate => existing_value}} when is_list(existing_value) ->
-        new_value = [object | existing_value ]
+        new_value = [object | existing_value]
         Map.put(map, subject, Map.merge(map[subject], %{predicate => new_value}))
       %{^subject => %{^predicate => existing_value}} ->
         new_value = [existing_value, object]
