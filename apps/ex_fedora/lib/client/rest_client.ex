@@ -11,12 +11,12 @@ defmodule ExFedora.RestClient do
   end
 
   defp process_request_headers(headers) when is_map(headers) do
-    Enum.into(headers, [{"Accept", "application/ld+json, application/n-triples,
+    Enum.into(headers, [{"Accept", "application/n-triples, application/ld+json,
         application/octet-stream"}])
   end
 
   defp process_request_headers(headers) do
-    Enum.into(headers, [{"Accept", "application/ld+json, application/n-triples,
+    Enum.into(headers, [{"Accept", "application/n-triples, application/ld+json, 
         application/octet-stream"}])
   end
 

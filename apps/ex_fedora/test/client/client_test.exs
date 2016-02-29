@@ -20,6 +20,23 @@ defmodule ExFedoraClientTest do
     assert response.headers.location
   end
 
+  test "POST to create an object with metadata", %{client: client} do
+    triples = %{
+      "" => %{
+        "http://test.com" => %RDF.Literal{value: "Testing", language: "en"}
+      }
+    }
+    {_, response} = Client.post(client, "", :rdf_source, triples)
+    assert response.status_code == 201
+    %{headers: %{location: location}} = response
+    "http://localhost:8984/rest/" <> id = location
+    {_, response} = Client.get(client, id)
+
+    assert response.statements
+    assert response.statements[location]["http://test.com"] ==
+    %RDF.Literal{value: "Testing", language: "en"}
+  end
+
   test "get an ID", %{client: client} do
     {_, %{headers: %{location: location}}} = Client.post(client, "")
     "http://localhost:8984/rest/" <> id = location

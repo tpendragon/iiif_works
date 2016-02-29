@@ -7,6 +7,10 @@ defmodule ExFedora.Client do
     RestClient.post(Path.join(module.url, id), parse_body(type, body), headers(type))
   end
 
+  defp parse_body(:rdf_source, map = %{}) do
+    NTriples.serialize(map)
+  end
+
   defp parse_body(:rdf_source, _body) do
     ""
   end
