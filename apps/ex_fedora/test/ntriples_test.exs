@@ -23,5 +23,21 @@ defmodule NTriplesTest do
     assert result["http://test.com/2"]["http://predicate.com"] == %Literal{value:
       "Fred's Stuff", language: "en"}
     assert result["http://test.com/3"]["http://predicate.com"] == %{"@id" =>
-      "http://mystuff.com" }  end
+      "http://mystuff.com" }
+  end
+
+  test "re-encoding" do
+    {:ok, content} = File.read("test/fixtures/single_ntriple.nt")
+    result = NTriples.parse(content)
+    assert "<http://test.com> <http://predicate.com> \"Fred's Phone\"@en ." == NTriples.serialize(result)
+  end
+
+  test "lossless re-encoding" do
+    {:ok, content} = File.read("test/fixtures/multiple_ntriple.nt")
+    result = NTriples.parse(content)
+
+    # It inverts the lists of values when it parses for performance reasons..
+    assert result ==
+    NTriples.parse(NTriples.serialize(NTriples.parse(NTriples.serialize(result))))
+  end
 end

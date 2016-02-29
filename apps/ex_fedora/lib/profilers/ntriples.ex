@@ -8,6 +8,13 @@ defmodule Profilers.NTriples do
     end
   end
 
+  def profile_serialize do
+    result = run
+    profile do
+      NTriples.serialize(result)
+    end
+  end
+
   def run do
     NTriples.parse(@content)
   end
