@@ -7,11 +7,11 @@ defmodule ExFedora.Client do
     RestClient.post(Path.join(module.url, id), parse_body(type, body), headers(type))
   end
 
-  defp parse_body(:rdf_source, body) do
+  defp parse_body(:rdf_source, _body) do
     ""
   end
 
-  defp parse_body(type, body) do
+  defp parse_body(_type, body) do
     body
   end
 
@@ -21,7 +21,7 @@ defmodule ExFedora.Client do
     ]
   end
 
-  defp headers(type) do
+  defp headers(_type) do
     []
   end
 

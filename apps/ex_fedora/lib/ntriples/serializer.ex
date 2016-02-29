@@ -2,9 +2,8 @@ require IEx
 defmodule NTriples.Serializer do
   def serialize(map = %{}) do
     map
-    |> Enum.reduce([], &subject_graph_to_triples/2)
+    |> RDF.Graph.to_triples
     |> Enum.map(&serialize_triple/1)
-    |> Enum.reverse
     |> Enum.join("\n")
   end
 
@@ -24,27 +23,7 @@ defmodule NTriples.Serializer do
     "\"#{object.value}\"@#{object.language}"
   end
 
-  defp serialize_object(object = %{"@id" => object_uri}) do
+  defp serialize_object(%{"@id" => object_uri}) do
     "<#{object_uri}>"
-  end
-
-  defp subject_graph_to_triples({predicate, object = %RDF.Literal{}}, acc) do
-    acc ++ [[predicate, object]]
-  end
-
-  defp subject_graph_to_triples({predicate, object = %{"@id" => _}}, acc) do
-    acc ++ [[predicate, object]]
-  end
-
-  defp subject_graph_to_triples({predicate, object}, acc) when is_list(object) do
-    list = object
-    |> Enum.flat_map(&subject_graph_to_triples({predicate, &1}, acc))
-  end
-
-  defp subject_graph_to_triples({subject, map = %{}}, acc) do
-    map = map
-    |> Enum.reduce([], &subject_graph_to_triples/2)
-    |> Enum.map(fn(lst) -> [subject | lst] end)
-    map ++ acc
   end
 end

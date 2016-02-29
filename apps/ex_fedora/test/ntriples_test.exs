@@ -15,8 +15,8 @@ defmodule NTriplesTest do
     {:ok, content} = File.read("test/fixtures/multiple_ntriple.nt")
     result = NTriples.parse(content)
     assert result["http://test.com"]["http://predicate.com"] == [%Literal{value:
-      "Fred's Third Phone", language: "en"}, %Literal{value: "Fred's Phone",
-      language: "en"}, %Literal{value: "Fred's Other Phone",
+      "Fred's Third Phone", language: "en"}, %Literal{value: "Fred's Other Phone",
+      language: "en"}, %Literal{value: "Fred's Phone",
       language: "en"}]
     assert result["http://test.com"]["http://predicate.com/2"] == %Literal{value:
       "Fred's Tablet", language: "en"}
@@ -37,7 +37,6 @@ defmodule NTriplesTest do
     result = NTriples.parse(content)
 
     # It inverts the lists of values when it parses for performance reasons..
-    assert result ==
-    NTriples.parse(NTriples.serialize(NTriples.parse(NTriples.serialize(result))))
+    assert String.rstrip(content, ?\n) == NTriples.serialize(result)
   end
 end

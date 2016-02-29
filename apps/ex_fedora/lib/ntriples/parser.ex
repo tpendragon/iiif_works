@@ -40,7 +40,7 @@ defmodule NTriples.Parser do
         new_value = [object | existing_value]
         Map.put(map, subject, Map.merge(map[subject], %{predicate => new_value}))
       %{^subject => %{^predicate => existing_value}} ->
-        new_value = [existing_value, object]
+        new_value = [object, existing_value]
         Map.put(map, subject, Map.merge(map[subject], %{predicate => new_value}))
       %{^subject => _} ->
         Map.put(map, subject, Map.merge(map[subject], %{predicate => object}))

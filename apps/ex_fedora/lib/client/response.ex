@@ -18,7 +18,7 @@ defmodule ExFedora.Client.Response do
     NTriples.parse(body)
   end
 
-  defp parse_graph(body, content_type) do
+  defp parse_graph(_body, _content_type) do
     []
   end
 end
