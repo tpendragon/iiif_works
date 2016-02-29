@@ -7,7 +7,7 @@ defmodule JSONLD.Parser do
 
   defp build_dataset(list) do
     list
-    |> Enum.reduce(%{}, &graph_to_dataset/2)
+    |> Enum.reduce(%{:_type_ => :subject}, &graph_to_dataset/2)
   end
 
   defp graph_to_dataset(graph, dataset) do
@@ -24,6 +24,7 @@ defmodule JSONLD.Parser do
   defp process_graph(graph) do
     Enum.map(graph, &process_predicate/1)
     |> Enum.reduce(%{}, fn({key, val}, map) -> Map.put(map, key, val) end)
+    |> Map.put(:_type_, :predicate)
   end
 
   defp process_predicate({"@type", value}) do

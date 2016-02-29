@@ -6,14 +6,15 @@ defmodule JSONLDTest do
   test "returns a dataset" do
     {:ok, fixture_1} = File.read("test/fixtures/simple_jsonld.jsonld")
     result = JSONLD.parse(fixture_1)
-    assert result["http://test.com"]
+    assert %{"http://test.com" => _, :_type_ => :subject} = result
     refute result["http://test.com"]["@id"]
   end
 
   test "parses type triples" do
     {:ok, fixture_1} = File.read("test/fixtures/simple_jsonld.jsonld")
     result = JSONLD.parse(fixture_1)
-    assert result["http://test.com"]["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
+    assert %{"http://www.w3.org/1999/02/22-rdf-syntax-ns#type" => _, :_type_ =>
+    :predicate} = result["http://test.com"]
   end
 
   test "parses values into literals" do

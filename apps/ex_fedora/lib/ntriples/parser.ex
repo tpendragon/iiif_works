@@ -8,7 +8,7 @@ defmodule NTriples.Parser do
     content
     |> String.split(".\n")
     |> Enum.map(&capture_triple_map/1)
-    |> Enum.reduce(%{}, &process_capture/2)
+    |> Enum.reduce(%{:_type_ => :subject}, &process_capture/2)
   end
 
   defp capture_triple_map("") do
@@ -37,15 +37,13 @@ defmodule NTriples.Parser do
   defp append_triple(map, {subject, predicate, object}) do
     case map do
       %{^subject => %{^predicate => existing_value}} when is_list(existing_value) ->
-        new_value = [object | existing_value]
-        Map.put(map, subject, Map.merge(map[subject], %{predicate => new_value}))
+        put_in(map, [subject, predicate], [object | existing_value])
       %{^subject => %{^predicate => existing_value}} ->
-        new_value = [object, existing_value]
-        Map.put(map, subject, Map.merge(map[subject], %{predicate => new_value}))
+        put_in(map, [subject, predicate], [object, existing_value])
       %{^subject => _} ->
-        Map.put(map, subject, Map.merge(map[subject], %{predicate => object}))
+        put_in(map, [subject, predicate], object)
       _ ->
-        Map.put(map, subject, %{predicate => object})
+        put_in(map, [subject], %{:_type_ => :predicate, predicate => object})
     end
   end
 
