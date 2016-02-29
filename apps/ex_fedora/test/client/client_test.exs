@@ -34,7 +34,7 @@ defmodule ExFedoraClientTest do
 
     assert response.statements
     assert response.statements[location]["http://test.com"] ==
-    %RDF.Literal{value: "Testing", language: "en"}
+    [%RDF.Literal{value: "Testing", language: "en"}]
   end
 
   test "get an ID", %{client: client} do

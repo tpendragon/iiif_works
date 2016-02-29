@@ -21,7 +21,7 @@ defmodule ExFedora.Client do
 
   defp headers(:rdf_source) do
     [
-      "content-type": "application/n-triples"
+      "content-type": "text/turtle"
     ]
   end
 
