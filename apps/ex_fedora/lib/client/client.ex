@@ -4,18 +4,22 @@ defmodule ExFedora.Client do
   defstruct [:url]
 
   def post(module, id, type \\ :rdf_source, body \\ []) do
-    RestClient.post(Path.join(module.url, id), parse_body(type, body), headers(type))
+    RestClient.post(
+      module.url <> "/" <> id,
+      serialize_body(type, body),
+      headers(type)
+    )
   end
 
-  defp parse_body(:rdf_source, map = %{}) do
+  defp serialize_body(:rdf_source, map = %{}) do
     NTriples.serialize(map)
   end
 
-  defp parse_body(:rdf_source, _body) do
+  defp serialize_body(:rdf_source, _body) do
     ""
   end
 
-  defp parse_body(_type, body) do
+  defp serialize_body(_type, body) when is_binary(body) do
     body
   end
 
@@ -30,15 +34,16 @@ defmodule ExFedora.Client do
   end
 
   def get(module, id) do
-    {result, response} = 
-      module.url
-      |> Path.join(id)
+    {result, response} =
+      module.url <> "/" <> id
       |> RestClient.get
-    response = 
-      response
-      |> Response.cast
-      |> Response.parse_statements
-    {result, response}
+    {result, parse_response(response)}
+  end
+
+  defp parse_response(response) do
+    response
+    |> Response.cast
+    |> Response.parse_statements
   end
 
 end
