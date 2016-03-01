@@ -1,5 +1,8 @@
 defmodule JSONLD.Parser do
   alias RDF.Literal
+  @moduledoc """
+  Functions for parsing JSON-LD graphs.
+  """
   def extract_statements(list) do
     list
     |> build_dataset

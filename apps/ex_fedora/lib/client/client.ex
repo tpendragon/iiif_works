@@ -1,4 +1,8 @@
 defmodule ExFedora.Client do
+  @moduledoc """
+  Provides functions to post/get triples from a Fedora server.
+  """
+
   alias ExFedora.RestClient
   alias ExFedora.Client.Response
   defstruct [:url]

@@ -1,4 +1,8 @@
 defmodule ExFedora.Client.Response do
+  @moduledoc """
+  Provides a wrapper around a Fedora response, mostly to allow for RDF
+  statements to be parsed from the response body.
+  """
   defstruct [:body, :headers, :status_code, :statements]
 
   def cast(module) do

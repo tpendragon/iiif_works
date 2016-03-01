@@ -1,4 +1,8 @@
 defmodule ExFedora.RestClient do
+  @moduledoc """
+  HTTPoison-based REST Client for accessing a Fedora Endpoint. Sends
+  RDF-specific accept headers.
+  """
   use HTTPoison.Base
   defp process_headers(headers) do
     headers
