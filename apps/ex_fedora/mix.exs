@@ -38,11 +38,12 @@ defmodule ExFedora.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.8.0"},
-      {:poison, "~> 2.0"},
+      {:poison, "~> 1.0"},
       {:benchwarmer, "~> 0.0.2", only: [:dev, :test]},
       {:benchfella, "~> 0.3.0", only: [:dev, :test]},
       {:exprof, "~> 0.2.0", only: [:dev, :test]},
-      {:dogma, "~> 0.0", only: :dev}
+      {:dogma, "~> 0.0", only: :dev},
+      {:ecto, "~> 1.1.4"}
     ]
   end
 end
