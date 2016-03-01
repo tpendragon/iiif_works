@@ -11,6 +11,12 @@ defmodule NTriplesTest do
       "Fred's Phone", language: "en"}
   end
 
+  test "parsing a single n-triple from a file" do
+    result = NTriples.parse(File.stream!("test/fixtures/single_ntriple.nt"))
+    assert result["http://test.com"]["http://predicate.com"] == %Literal{value:
+      "Fred's Phone", language: "en"}
+  end
+
   test "parsing multiple n-triples" do
     {:ok, content} = File.read("test/fixtures/multiple_ntriple.nt")
     result = NTriples.parse(content)

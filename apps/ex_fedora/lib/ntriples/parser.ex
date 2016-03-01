@@ -1,40 +1,40 @@
-require IEx
 defmodule NTriples.Parser do
   alias RDF.Literal
+  alias RDF.SubjectMap
+  alias RDF.PredicateMap
   @ntriples_regex ~r/(?<subject><(?<subject_uri>[^\s]+)>|_:([A-Za-z][A-Za-z0-9\-_]*))[
   ]*(?<predicate><(?<predicate_uri>[^\s]+)>)[
   ]*(?<object><(?<object_uri>[^\s]+)>|_:([A-Za-z][A-Za-z0-9\-_]*)|"(?<literal_string>(?:\\"|[^"])*)"(@(?<literal_language>[a-z]+[\-A-Za-z0-9]*)|\^\^<(?<literal_type>[^>]+)>)?)[ ]*./i
-  def parse(content) do
+
+  def parse(content) when is_binary(content) do
     content
     |> String.split(".\n")
-    |> Enum.map(&capture_triple_map/1)
-    |> Enum.reduce(%{:_type_ => :subject}, &process_capture/2)
+    |> parse
   end
 
-  defp capture_triple_map("") do
-    %{}
+  def parse(enumerable) do
+    enumerable
+    |> Enum.map(&to_triples/1)
+    |> Enum.reduce(SubjectMap.new, &append_triple/2)
   end
 
-  defp capture_triple_map(string) do
+  defp to_triples("") do
+    {}
+  end
+
+  defp to_triples(string) when is_binary(string) do
     Regex.named_captures(@ntriples_regex, string)
+    |> to_triples
   end
 
-  defp process_capture(nil, accumulator) do
-    accumulator
-  end
-
-  defp process_capture(map, accumulator) when map == %{} do
-    accumulator
-  end
-
-  defp process_capture(capture_map, accumulator) do
+  defp to_triples(capture_map = %{"subject" => _}) do
     subject = process_subject(capture_map)
     predicate = process_predicate(capture_map)
     object = process_object(capture_map)
-    append_triple(accumulator, {subject, predicate, object})
+    {subject, predicate, object}
   end
 
-  defp append_triple(map, {subject, predicate, object}) do
+  defp append_triple({subject, predicate, object}, map) do
     case map do
       %{^subject => %{^predicate => existing_value}} when is_list(existing_value) ->
         put_in(map, [subject, predicate], [object | existing_value])
@@ -43,9 +43,11 @@ defmodule NTriples.Parser do
       %{^subject => _} ->
         put_in(map, [subject, predicate], object)
       _ ->
-        put_in(map, [subject], %{:_type_ => :predicate, predicate => object})
+        put_in(map, [subject], put_in(PredicateMap.new, [predicate], object))
     end
   end
+
+  defp append_triple(_, map), do: map
 
   defp process_subject(%{"subject_uri" => subject_uri}) do
     subject_uri
