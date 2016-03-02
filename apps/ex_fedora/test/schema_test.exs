@@ -3,7 +3,7 @@ defmodule ExFedoraSchemaTest do
 
   defmodule FedoraSchemaTest do
     use ExFedora.Schema
-    schema do
+    schema "books" do
       property :title, predicate: "http://test.com"
     end
   end
