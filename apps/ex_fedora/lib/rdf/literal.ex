@@ -14,6 +14,12 @@ defmodule RDF.Literal do
   end
 
   def load(literal = %RDF.Literal{}), do: { :ok, [literal] }
+  def load(list) when is_list(list) do
+    dumped_list =
+      list
+      |> Enum.flat_map(fn(literal) -> elem({:ok, _} = dump(literal),1) end)
+    {:ok, dumped_list}
+  end
 
   def dump(literal = %RDF.Literal{}), do: { :ok, [literal] }
   def dump(list) when is_list(list) do

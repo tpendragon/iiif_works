@@ -20,6 +20,25 @@ defmodule ExFedoraClientTest do
     assert response.headers.location
   end
 
+  test "failing to post", %{client: client} do
+    {:error, _} = Client.post(client, random_string, :rdf_source, [])
+  end
+
+  test "HEAD request", %{client: client} do
+    {:error, %{status_code: 404}} = Client.head(client, random_string)
+  end
+
+  test "PUT request", %{client: client} do
+    str = random_string
+    {:ok, _} = Client.put(client, str)
+    {:ok, _} = Client.head(client, str)
+  end
+
+  def random_string do
+    str_length = 8
+    :crypto.strong_rand_bytes(str_length) |> Base.url_encode64 |> binary_part(0, str_length)
+  end
+
   test "POST to create an object with metadata", %{client: client} do
     triples = %{
       "" => %{

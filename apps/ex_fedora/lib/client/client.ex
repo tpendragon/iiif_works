@@ -1,3 +1,4 @@
+require IEx
 defmodule ExFedora.Client do
   @moduledoc """
   Provides functions to post/get triples from a Fedora server.
@@ -8,11 +9,40 @@ defmodule ExFedora.Client do
   defstruct [:url]
 
   def post(module, id, type \\ :rdf_source, body \\ []) do
-    RestClient.post(
-      module.url <> "/" <> id,
-      serialize_body(type, body),
-      headers(type)
-    )
+    {result, response} =
+      RestClient.post(
+        module.url <> "/" <> id,
+        serialize_body(type, body),
+        headers(type)
+      )
+    process_response({result, response})
+  end
+
+  def head(module, id) do
+    result = 
+      RestClient.head(
+        module.url <> "/" <> id
+      )
+    process_response(result)
+  end
+
+  def put(module, id, type \\ :rdf_source, body \\ []) do
+    result = 
+      RestClient.put(
+        module.url <> "/" <> id,
+        serialize_body(type, body),
+        headers(type)
+      )
+    process_response(result)
+  end
+
+  defp process_response({result, response}) do
+    case {result, response} do
+      {_, %{status_code: x}} when x >= 400 ->
+        {:error, response}
+      _ ->
+        {result, response}
+    end
   end
 
   defp serialize_body(:rdf_source, map = %{}) do

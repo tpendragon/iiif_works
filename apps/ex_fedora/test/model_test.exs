@@ -51,4 +51,42 @@ defmodule ExFedoraModelTest do
     post_graph = ExFedora.Model.to_graph(model)
     assert graph == post_graph
   end
+
+  test "merging graphs" do
+    graph = put_in(RDF.SubjectMap.new, 
+                ["http://subject.com"], 
+                put_in(RDF.PredicateMap.new,
+                    ["http://test.com"],
+                    [%RDF.Literal{value: "yo"}]))
+    graph = put_in(graph, ["http://subject.com", "http://predicate"],[%RDF.Literal{value: "test"}])
+    model = ExFedora.Model.from_graph(ExFedoraModel, "http://subject.com", graph)
+
+    new_graph = ExFedora.Model.to_graph(model)
+    unmapped_graph = model.unmapped_graph
+    result = RDF.Graph.merge(new_graph, unmapped_graph)
+    assert result == graph
+  end
+
+  test "merging graphs with values" do
+    graph1 = put_in(RDF.SubjectMap.new, 
+                ["http://subject.com"], 
+                put_in(RDF.PredicateMap.new,
+                    ["http://test.com"],
+                    %RDF.Literal{value: "yo"}))
+    graph2 = put_in(graph1, ["http://subject.com", "http://test.com"],
+      [%RDF.Literal{value: "test"}])
+    graph3 = put_in(graph1, ["http://subject.com", "http://test.com"],
+      %RDF.Literal{value: "test"})
+    graph4 = put_in(graph1, ["http://subject.com", "http://test.com"],
+      %RDF.Literal{value: "yo"})
+    expected = put_in(RDF.SubjectMap.new, 
+                ["http://subject.com"], 
+                put_in(RDF.PredicateMap.new,
+                    ["http://test.com"],
+                    [ %RDF.Literal{value: "yo"}, %RDF.Literal{value: "test"}]))
+    assert RDF.Graph.merge(graph1, graph2) == expected
+    assert RDF.Graph.merge(graph1, graph3) == expected
+    assert RDF.Graph.merge(graph1, graph4) == graph1
+    assert RDF.Graph.merge(graph2, graph2) == graph2
+  end
 end

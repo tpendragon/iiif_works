@@ -19,8 +19,12 @@ defmodule NTriples.Serializer do
     "<#{predicate}>"
   end
 
-  defp serialize_object(object = %RDF.Literal{}) do
+  defp serialize_object(object = %RDF.Literal{language: lang}) when is_binary(lang) do
     "\"#{object.value}\"@#{object.language}"
+  end
+
+  defp serialize_object(object = %RDF.Literal{}) do
+    "\"#{object.value}\""
   end
 
   defp serialize_object(%{"@id" => object_uri}) do
