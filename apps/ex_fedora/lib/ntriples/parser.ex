@@ -8,13 +8,19 @@ defmodule NTriples.Parser do
 
   def parse(content) when is_binary(content) do
     content
-    |> String.split(".\n")
+    |> Stream.unfold(fn str ->
+      case String.split(str, "\n", parts: 2, trim: true) do
+        []      -> nil
+        [value] -> {value, ""}
+        list    -> List.to_tuple(list)
+      end
+    end)
     |> parse
   end
 
   def parse(enumerable) do
     enumerable
-    |> Enum.map(&to_triples/1)
+    |> Stream.map(&to_triples/1)
     |> Enum.reduce(SubjectMap.new, &append_triple/2)
   end
 

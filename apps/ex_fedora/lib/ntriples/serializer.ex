@@ -3,7 +3,7 @@ defmodule NTriples.Serializer do
   def serialize(map = %{}) do
     map
     |> RDF.Graph.to_triples
-    |> Enum.map(&serialize_triple/1)
+    |> Stream.map(&serialize_triple/1)
     |> Enum.join("\n")
   end
 

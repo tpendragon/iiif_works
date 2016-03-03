@@ -9,7 +9,7 @@ defmodule ExFedoraSchemaTest do
   end
 
   test "defining field" do
-    assert FedoraSchemaTest.__schema__(:fields) == [:id, :title]
+    assert FedoraSchemaTest.__schema__(:fields) == [:unmapped_graph, :id, :title]
   end
 
   test "predicates" do

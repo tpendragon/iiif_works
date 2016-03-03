@@ -22,6 +22,9 @@ defmodule RDF.Literal do
       |> Enum.flat_map(fn(literal) -> elem({:ok, _} = dump(literal),1) end)
     {:ok, casted_list}
   end
+  def dump(string) when is_binary(string) do
+    {:ok, [%RDF.Literal{value: string}] }
+  end
   def dump(_), do: :error
 
   def type, do: :literal

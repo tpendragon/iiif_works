@@ -43,7 +43,7 @@ defmodule ExFedora.Mixfile do
       {:benchfella, "~> 0.3.0", only: [:dev, :test]},
       {:exprof, "~> 0.2.0", only: [:dev, :test]},
       {:dogma, "~> 0.0", only: :dev},
-      {:ecto, "~> 1.1.4"}
+      {:ecto, "~> 2.0.0-beta.1"}
     ]
   end
 end

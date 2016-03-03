@@ -3,7 +3,7 @@ defmodule ExFedora.Schema do
     quote do
       require Ecto.Schema
       import ExFedora.Schema, only: [schema: 2, property: 2]
-      @primary_key {:id, :id, autogenerate: true}
+      @primary_key {:id, :binary_id, autogenerate: true}
       @timestamps_opts []
       @foreign_key_type :id
       @ecto_embedded false
@@ -23,7 +23,10 @@ defmodule ExFedora.Schema do
   defmacro schema(name, [do: block]) do
     quote do
       Module.register_attribute(__MODULE__, :struct_fields, accumulate: true)
+      Module.register_attribute(__MODULE__, :changeset_fields, accumulate: true)
       Module.put_attribute(__MODULE__, :struct_fields, {:unmapped_graph, %{}})
+      Module.put_attribute(__MODULE__, :ecto_fields, {:unmapped_graph, :map})
+      Module.put_attribute(__MODULE__, :changeset_fields, {:unmapped_graph, :map})
       Ecto.Schema.schema(unquote(name), do: unquote(block))
       predicates = @exfedora_predicates |> Enum.reverse
       Module.eval_quoted __ENV__, [
@@ -41,7 +44,6 @@ defmodule ExFedora.Schema do
       Ecto.Schema.__field__(__MODULE__,
         unquote(name),
         RDF.Literal,
-        false,
         unquote(opts)
       )
     end

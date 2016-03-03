@@ -1,4 +1,6 @@
+require IEx
 defmodule ExFedora.Model do
+  alias Ecto.Changeset
   defmacro __using__(_) do
     quote do
       use ExFedora.Schema
@@ -9,7 +11,35 @@ defmodule ExFedora.Model do
     map = schema_to_map(mod.__schema__(:predicates), graph[subject])
     map = put_in(map, [:unmapped_graph], put_in(RDF.SubjectMap.new, [subject],
     map[:unmapped_graph]))
+    map = put_in(map, [:id], subject)
     struct(mod, map)
+  end
+
+  def to_graph(changeset = %Changeset{}, schema) do
+    to_graph(Map.to_list(changeset.data), schema)
+  end
+
+  def to_graph(fields, schema) when is_list(fields) do
+    predicate_graph = 
+      fields
+      |> Enum.map(&predicate_to_values(&1, schema))
+      |> Enum.filter(fn (val) -> val != {} end)
+      |> Enum.into(RDF.PredicateMap.new)
+    subject = to_string(fields[:id])
+    RDF.SubjectMap.new(%{subject => predicate_graph})
+  end
+
+  def predicate_to_values({property, value}, schema) do
+    case schema[property] do
+      nil ->
+        {}
+      _ ->
+        { schema[property], value }
+    end
+  end
+
+  def to_graph(map = %{:__struct__ => struct}) do
+    graph = to_graph(Changeset.change(map), struct.__schema__(:predicates))
   end
 
   defp schema_to_map(schema, graph) when is_list(schema) do
