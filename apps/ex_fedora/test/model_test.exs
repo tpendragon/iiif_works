@@ -25,12 +25,18 @@ defmodule ExFedoraModelTest do
     result = 
       %ExFedoraModel{}
       |> Ecto.Changeset.cast(%{title: "http://test.com"}, [:title], [])
-    assert %RDF.Literal{value: "http://test.com"} = result.changes.title
+    assert [%RDF.Literal{value: "http://test.com"}] = result.changes.title
 
     result = 
       %ExFedoraModel{}
       |> Ecto.Changeset.cast(%{title: %RDF.Literal{value: "Testing", language:
           "en"}}, [:title], [])
-    assert %RDF.Literal{value: "Testing", language: "en"} = result.changes.title
+    assert [%RDF.Literal{value: "Testing", language: "en"}] = result.changes.title
+
+    result =
+      %ExFedoraModel{}
+      |> Ecto.Changeset.cast(%{title: [%RDF.Literal{value: "Testing", language:
+          "en"}]}, [:title], [])
+    assert [%RDF.Literal{value: "Testing", language: "en"}] = result.changes.title
   end
 end
