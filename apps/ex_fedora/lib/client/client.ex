@@ -71,7 +71,7 @@ defmodule ExFedora.Client do
     {result, response} =
       module.url <> "/" <> id
       |> RestClient.get
-    {result, parse_response(response)}
+    process_response({result, parse_response(response)})
   end
 
   defp parse_response(response) do

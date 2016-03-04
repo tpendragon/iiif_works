@@ -1,9 +1,16 @@
+require IEx
 defmodule RDF.Literal do
   @behaviour Ecto.Type
   defstruct [:value, :language]
 
   def cast(string) when is_binary(string) do
-    {:ok, [%RDF.Literal{value: string}]}
+    {:ok, [string]}
+  end
+  def cast(%RDF.Literal{value: val, language: nil}) do
+    { :ok, [val] }
+  end
+  def cast(%RDF.Literal{value: val, language: ""}) do
+    { :ok, [val] }
   end
   def cast(literal = %RDF.Literal{}), do: { :ok, [literal] }
   def cast(list) when is_list(list) do

@@ -16,8 +16,6 @@ end
 defmodule Ecto.Integration.Case do
   use ExUnit.CaseTemplate
 
-  alias Ecto.Integration.TestRepo
-
   setup_all do
     :ok
   end
@@ -26,4 +24,4 @@ defmodule Ecto.Integration.Case do
     :ok
   end
 end
-{:ok, pid} = TestRepo.start_link
+{:ok, _} = TestRepo.start_link

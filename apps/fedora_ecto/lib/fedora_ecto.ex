@@ -1,6 +1,7 @@
 require IEx
 defmodule Fedora.Ecto do
   @behaviour Ecto.Adapter
+  alias Fedora.Ecto.NormalizedQuery
   defmacro __before_compile__(env) do
     quote do
     end
@@ -42,8 +43,28 @@ defmodule Fedora.Ecto do
     {_, root} = schema_meta.source
     repo
     initialize(repo, root)
-    pooled_command([client(repo), root, combined_graph])
+    pooled_command([:insert, client(repo), root, combined_graph])
     |> process_result(returning, client(repo))
+  end
+
+  def prepare(function, query) do
+    {:nocache, {function, query}}
+  end
+
+  def execute(repo, meta, {cached, {:all, query}}, params, preprocess, opts) do
+    client = client(repo)
+    {root, struct} = query.from
+    params = List.first(params)
+    result = pooled_command([:query, client, params])
+    case result do
+      {:ok, output} ->
+        subject = client.url <> "/" <> params
+        result = ExFedora.Model.from_graph(struct, subject, output.statements)
+        result = Map.put(result, :id, String.replace_leading(result.id, client.url <> "/", ""))
+        {1, [[result]]}
+      {:error, _} ->
+        raise "Something went wrong when querying for #{params}"
+    end
   end
 
   defp pooled_command(args) do
@@ -67,7 +88,7 @@ defmodule Fedora.Ecto do
   end
 
   defp initialize(repo, root) do
-    pooled_command([client(repo), root])
+    pooled_command([:put, client(repo), root])
     repo
   end
 end

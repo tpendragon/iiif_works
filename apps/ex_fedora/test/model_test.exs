@@ -15,7 +15,7 @@ defmodule ExFedoraModelTest do
                     [%RDF.Literal{value: "yo"}]))
     graph = put_in(graph, ["http://subject.com", "http://predicate"],[%RDF.Literal{value: "test"}])
     model = ExFedora.Model.from_graph(ExFedoraModel, "http://subject.com", graph)
-    assert %{title: [%RDF.Literal{value: "yo"}], id: "http://subject.com"} = model
+    assert %{title: ["yo"], id: "http://subject.com"} = model
 
     assert %{"http://subject.com" => %{"http://predicate" =>
           [%RDF.Literal{value: "test"}]}} = model.unmapped_graph
@@ -25,7 +25,7 @@ defmodule ExFedoraModelTest do
     result = 
       %ExFedoraModel{}
       |> Ecto.Changeset.cast(%{title: "http://test.com"}, [:title], [])
-    assert [%RDF.Literal{value: "http://test.com"}] = result.changes.title
+    assert ["http://test.com"] = result.changes.title
 
     result = 
       %ExFedoraModel{}
@@ -47,7 +47,7 @@ defmodule ExFedoraModelTest do
                     ["http://test.com"],
                     [%RDF.Literal{value: "yo"}]))
     model = ExFedora.Model.from_graph(ExFedoraModel, "http://subject.com", graph)
-    assert %{title: [%RDF.Literal{value: "yo"}]} = model
+    assert %{title: ["yo"]} = model
     post_graph = ExFedora.Model.to_graph(model)
     assert graph == post_graph
   end

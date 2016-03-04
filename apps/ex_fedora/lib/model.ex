@@ -8,11 +8,15 @@ defmodule ExFedora.Model do
   end
 
   def from_graph(mod, subject, graph = %{}) when is_binary(subject) do
+    map = graph_to_fields(mod, subject, graph)
+    struct(mod, map)
+  end
+
+  def graph_to_fields(mod, subject, graph=%{}) when is_binary(subject) do
     map = schema_to_map(mod.__schema__(:predicates), graph[subject])
     map = put_in(map, [:unmapped_graph], put_in(RDF.SubjectMap.new, [subject],
     map[:unmapped_graph]))
-    map = put_in(map, [:id], subject)
-    struct(mod, map)
+    put_in(map, [:id], subject)
   end
 
   def to_graph(changeset = %Changeset{}, schema) do
@@ -34,7 +38,7 @@ defmodule ExFedora.Model do
       nil ->
         {}
       _ ->
-        { schema[property], value }
+        { schema[property], elem(RDF.Literal.dump(value),1) }
     end
   end
 
@@ -56,7 +60,7 @@ defmodule ExFedora.Model do
       nil ->
         {{property, nil}, graph}
       _ ->
-        {{property, graph[predicate]}, Map.drop(graph, [predicate])}
+        {{property, elem(RDF.Literal.cast(graph[predicate]),1)}, Map.drop(graph, [predicate])}
     end
   end
 end

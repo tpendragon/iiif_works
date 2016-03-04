@@ -9,6 +9,7 @@ defmodule RepoTest do
     end
   end
 
+  @tag timeout: 300000
   test "insert and get!" do
     graph = %{:_type_ => :subject, "" => %{:_type_ => :predicate,
       "http://predicate.com" => %RDF.Literal{value: "yo"}}}
@@ -16,6 +17,9 @@ defmodule RepoTest do
     assert book.id == nil
     result = TestRepo.insert!(book)
     assert result.id
-    IO.puts result.id
+
+    new_result = TestRepo.get!(Book, result.id)
+    assert new_result.id == result.id
+    assert new_result.title == ["test"]
   end
 end
