@@ -12,6 +12,10 @@ defmodule ExFedora.Model do
     struct(mod, map)
   end
 
+  def from_graph(mod, subject, []) do
+    struct(mod, id: subject)
+  end
+
   def graph_to_fields(mod, subject, graph=%{}) when is_binary(subject) do
     map = schema_to_map(mod.__schema__(:predicates), graph[subject])
     map = put_in(map, [:unmapped_graph], put_in(RDF.SubjectMap.new, [subject],

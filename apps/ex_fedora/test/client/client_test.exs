@@ -28,6 +28,14 @@ defmodule ExFedoraClientTest do
     {:error, %{status_code: 404}} = Client.head(client, random_string)
   end
 
+  test "DELETE request", %{client: client} do
+    {:ok, response} = Client.post(client, "", :rdf_source, [])
+    %{headers: %{location: location}} = response
+    "http://localhost:8984/rest/" <> id = location
+    assert {:ok, _} = Client.delete(client, id)
+    assert {:error, %{status_code: 410}} = Client.head(client, id) # Tombstone
+  end
+
   test "PUT request", %{client: client} do
     str = random_string
     {:ok, _} = Client.put(client, str)

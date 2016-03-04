@@ -9,7 +9,7 @@ alias Ecto.Integration.TestRepo
 Application.put_env(:ecto, TestRepo,
                     adapter: Fedora.Ecto,
                     url: "http://localhost:8984/rest",
-                    pool_size: 1)
+                    pool_size: 20)
 defmodule Ecto.Integration.TestRepo do
   use Ecto.Integration.Repo, otp_app: :ecto
 end

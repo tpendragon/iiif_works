@@ -13,6 +13,7 @@ defmodule RDF.Literal do
     { :ok, [val] }
   end
   def cast(literal = %RDF.Literal{}), do: { :ok, [literal] }
+  def cast(literal = %{"@id" => _}), do: { :ok, [literal] }
   def cast(list) when is_list(list) do
     casted_list =
       list

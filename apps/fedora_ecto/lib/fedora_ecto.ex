@@ -62,8 +62,24 @@ defmodule Fedora.Ecto do
         result = ExFedora.Model.from_graph(struct, subject, output.statements)
         result = Map.put(result, :id, String.replace_leading(result.id, client.url <> "/", ""))
         {1, [[result]]}
+      {:error, %{status_code: 404}} ->
+        {0, []}
+      {:error, %{status_code: 410}} ->
+        {0, []}
       {:error, _} ->
         raise "Something went wrong when querying for #{params}"
+    end
+  end
+
+  def delete(repo, schema_meta, filters, options) do
+    client = client(repo)
+    [id: id] = filters
+    result = pooled_command([:delete, client, id])
+    case result do
+      {:ok, _} ->
+        {:ok, filters}
+      {:error, _} ->
+        {:error, :stale}
     end
   end
 
@@ -71,7 +87,8 @@ defmodule Fedora.Ecto do
     :poolboy.transaction(__pool__, 
       fn(pid) ->
         :gen_server.call(pid, args)
-      end
+      end,
+      :infinity
     )
   end
 

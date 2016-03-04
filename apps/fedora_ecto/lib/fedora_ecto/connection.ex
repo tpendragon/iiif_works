@@ -28,4 +28,9 @@ defmodule Fedora.Ecto.Connection do
   def handle_call([:query, client, params], pid, state) when is_list(params) do
     handle_call([:query, client, List.first(params)], pid, state)
   end
+
+  def handle_call([:delete, client, id], pid, state) do
+    result = ExFedora.Client.delete(client, id)
+    {:reply, result, state}
+  end
 end

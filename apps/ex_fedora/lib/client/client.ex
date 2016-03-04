@@ -36,6 +36,13 @@ defmodule ExFedora.Client do
     process_response(result)
   end
 
+  def delete(module, id) do
+    result = RestClient.delete(
+      module.url <> "/" <> id
+    )
+    process_response(result)
+  end
+
   defp process_response({result, response}) do
     case {result, response} do
       {_, %{status_code: x}} when x >= 400 ->
@@ -71,7 +78,13 @@ defmodule ExFedora.Client do
     {result, response} =
       module.url <> "/" <> id
       |> RestClient.get
-    process_response({result, parse_response(response)})
+      |> process_response
+    case result do
+      :ok ->
+        {result, parse_response(response)}
+      _ ->
+        {result, response}
+    end
   end
 
   defp parse_response(response) do

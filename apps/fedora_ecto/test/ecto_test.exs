@@ -2,6 +2,7 @@ require IEx
 defmodule RepoTest do
   use Ecto.Integration.Case
   alias Ecto.Integration.TestRepo
+  import Ecto.Query, only: [from: 2]
   defmodule Book do
     use ExFedora.Schema
     schema "books" do
@@ -21,6 +22,20 @@ defmodule RepoTest do
     new_result = TestRepo.get!(Book, result.id)
     assert new_result.id == result.id
     assert new_result.title == ["test"]
+    other_result = TestRepo.all(from(p in Book, where: p.id == ^new_result.id))
+    assert other_result == [new_result]
+  end
+
+  test "record doesn't exist" do
+    new_result = TestRepo.get(Book, "books/1")
+    assert new_result == nil
+  end
+
+  test "deleting a record" do
+    book = %Book{title: ["test"]}
+    book = TestRepo.insert!(book)
+    {:ok, output} = TestRepo.delete(book)
+    assert TestRepo.get(Book, book.id) == nil
   end
 
   test "inserting language-tagged literals" do
@@ -34,5 +49,6 @@ defmodule RepoTest do
     new_result = TestRepo.get!(Book, result.id)
     assert new_result.id == result.id
     assert new_result.title == [%RDF.Literal{value: "testing", language: "en"}]
+
   end
 end
