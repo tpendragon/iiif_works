@@ -22,4 +22,17 @@ defmodule RepoTest do
     assert new_result.id == result.id
     assert new_result.title == ["test"]
   end
+
+  test "inserting language-tagged literals" do
+    graph = %{:_type_ => :subject, "" => %{:_type_ => :predicate,
+      "http://predicate.com" => %RDF.Literal{value: "yo", language: "en"}}}
+    book = %Book{title: [%RDF.Literal{value: "testing", language: "en"}], unmapped_graph: graph}
+    assert book.id == nil
+    result = TestRepo.insert!(book)
+    assert result.id
+
+    new_result = TestRepo.get!(Book, result.id)
+    assert new_result.id == result.id
+    assert new_result.title == [%RDF.Literal{value: "testing", language: "en"}]
+  end
 end
