@@ -34,7 +34,7 @@ defmodule RepoTest do
   test "deleting a record" do
     book = %Book{title: ["test"]}
     book = TestRepo.insert!(book)
-    {:ok, output} = TestRepo.delete(book)
+    {:ok, _} = TestRepo.delete(book)
     assert TestRepo.get(Book, book.id) == nil
   end
 
