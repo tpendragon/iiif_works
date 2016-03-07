@@ -85,7 +85,8 @@ defmodule ExFedoraClientTest do
     {:ok, _} = Client.get(client, id)
 
     {:ok, new_client} = Client.commit_transaction(client)
-    assert {:ok, _} = Client.get(new_client, id)
+    assert {:ok, _} = Client.delete(new_client, id)
+    Client.delete(new_client, "")
   end
 
   setup do
