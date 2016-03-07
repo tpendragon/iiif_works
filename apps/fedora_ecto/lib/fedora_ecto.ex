@@ -12,7 +12,8 @@ defmodule Fedora.Ecto do
   end
 
   def client(repo) do
-    %ExFedora.Client{url: Application.get_env(:ecto, repo)[:url]}
+    %ExFedora.Client{url: Application.get_env(:ecto, repo)[:url], root:
+      Application.get_env(:ecto, repo)[:ldp_root]}
   end
 
   def child_spec(repo, opts) do
@@ -58,9 +59,10 @@ defmodule Fedora.Ecto do
     result = pooled_command([:query, client, params])
     case result do
       {:ok, output} ->
-        subject = client.url <> "/" <> params
+        subject = ExFedora.Client.id_to_url(client, params)
         result = ExFedora.Model.from_graph(struct, subject, output.statements)
-        result = Map.put(result, :id, String.replace_leading(result.id, client.url <> "/", ""))
+        result = Map.put(result, :id, String.replace_leading(result.id,
+        ExFedora.Client.id_to_url(client, "") <> "/", ""))
         {1, [[result]]}
       {:error, %{status_code: 404}} ->
         {0, []}
@@ -100,7 +102,8 @@ defmodule Fedora.Ecto do
   end
 
   defp process_result(:id, {response, client}) do
-    test_id = String.replace_leading(response.headers.location, client.url <> "/","")
+    test_id = String.replace_leading(response.headers.location,
+    ExFedora.Client.id_to_url(client, "") <> "/","")
     {:id, test_id}
   end
 

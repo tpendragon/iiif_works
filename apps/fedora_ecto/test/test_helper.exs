@@ -9,6 +9,7 @@ alias Ecto.Integration.TestRepo
 Application.put_env(:ecto, TestRepo,
                     adapter: Fedora.Ecto,
                     url: "http://localhost:8984/rest",
+                    ldp_root: "testing",
                     pool_size: 20)
 defmodule Ecto.Integration.TestRepo do
   use Ecto.Integration.Repo, otp_app: :ecto
@@ -21,6 +22,11 @@ defmodule Ecto.Integration.Case do
   end
 
   setup do
+    on_exit(fn ->
+      client = Fedora.Ecto.client(TestRepo)
+      ExFedora.Client.delete(client, "")
+      ExFedora.Client.delete(client, "fcr:tombstone")
+    end)
     :ok
   end
 end
