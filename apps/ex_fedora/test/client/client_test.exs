@@ -5,10 +5,11 @@ defmodule ExFedoraClientTest do
   alias ExFedora.Client
 
   setup do
-    client = %Client{url: "http://localhost:8984/rest", root: "developing"}
+    client = 
+      %Client{url: "http://localhost:8984/rest", root: random_string}
+      |> Client.start_transaction
     on_exit fn ->
-      Client.delete(client, "")
-      Client.delete(client, "fcr:tombstone")
+      Client.rollback_transaction(client)
     end
     {:ok, client: client}
   end
@@ -35,7 +36,7 @@ defmodule ExFedoraClientTest do
   test "DELETE request", %{client: client} do
     {:ok, response} = Client.post(client, "", :rdf_source, [])
     %{headers: %{location: location}} = response
-    "http://localhost:8984/rest/developing/" <> id = location
+    id = ExFedora.Client.uri_to_id(client, location)
     assert {:ok, _} = Client.delete(client, id)
     assert {:error, %{status_code: 410}} = Client.head(client, id) # Tombstone
   end
@@ -62,7 +63,7 @@ defmodule ExFedoraClientTest do
     {_, response} = Client.post(client, "", :rdf_source, triples)
     assert response.status_code == 201
     %{headers: %{location: location}} = response
-    "http://localhost:8984/rest/developing/" <> id = location
+    id = ExFedora.Client.uri_to_id(client, location)
     {_, response} = Client.get(client, id)
 
     assert response.statements
@@ -72,11 +73,19 @@ defmodule ExFedoraClientTest do
 
   test "get an ID", %{client: client} do
     {_, %{headers: %{location: location}}} = Client.post(client, "")
-    "http://localhost:8984/rest/developing/" <> id = location
+    id = ExFedora.Client.uri_to_id(client, location)
     {_, response} = Client.get(client, id)
 
     assert response.statements
-    assert RDF.Graph.size(response.statements) == 13
+    assert RDF.Graph.size(response.statements) == 9
+  end
+  test "committing a transaction", %{client: client} do
+    {_, %{headers: %{location: location}}} = Client.post(client, "")
+    id = ExFedora.Client.uri_to_id(client, location)
+    {:ok, _} = Client.get(client, id)
+
+    {:ok, new_client} = Client.commit_transaction(client)
+    assert {:ok, _} = Client.get(new_client, id)
   end
 
   setup do
@@ -87,7 +96,7 @@ defmodule ExFedoraClientTest do
   test "working with a root path", %{rooted_client: client} do
     {_, response} = Client.post(client, "", :rdf_source, [])
     assert response.status_code == 201
-    assert "http://localhost:8984/rest/testing/" <> id = response.headers.location
+    id = ExFedora.Client.uri_to_id(client, response.headers.location)
     Client.delete(client, id)
   end
 end
