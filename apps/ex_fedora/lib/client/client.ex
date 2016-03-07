@@ -10,12 +10,18 @@ defmodule ExFedora.Client do
 
   def post(client, id, type \\ :rdf_source, body \\ []) do
     {result, response} =
-      RestClient.post(
-        id_to_url(client, id),
-        serialize_body(type, body),
-        headers(type)
-      )
+      client
+      |> ensure_root
+      |> id_to_url(id)
+      |> RestClient.post(serialize_body(type, body), headers(type))
     process_response({result, response})
+  end
+
+  defp ensure_root(client = %ExFedora.Client{root: ""}), do: client
+  defp ensure_root(client = %ExFedora.Client{root: binary}) do
+    client
+    |> put("")
+    client
   end
 
   def id_to_url(client, "") do

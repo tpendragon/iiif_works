@@ -5,7 +5,11 @@ defmodule ExFedoraClientTest do
   alias ExFedora.Client
 
   setup do
-    client = %Client{url: "http://localhost:8984/rest"}
+    client = %Client{url: "http://localhost:8984/rest", root: "developing"}
+    on_exit fn ->
+      Client.delete(client, "")
+      Client.delete(client, "fcr:tombstone")
+    end
     {:ok, client: client}
   end
 
@@ -31,7 +35,7 @@ defmodule ExFedoraClientTest do
   test "DELETE request", %{client: client} do
     {:ok, response} = Client.post(client, "", :rdf_source, [])
     %{headers: %{location: location}} = response
-    "http://localhost:8984/rest/" <> id = location
+    "http://localhost:8984/rest/developing/" <> id = location
     assert {:ok, _} = Client.delete(client, id)
     assert {:error, %{status_code: 410}} = Client.head(client, id) # Tombstone
   end
@@ -58,7 +62,7 @@ defmodule ExFedoraClientTest do
     {_, response} = Client.post(client, "", :rdf_source, triples)
     assert response.status_code == 201
     %{headers: %{location: location}} = response
-    "http://localhost:8984/rest/" <> id = location
+    "http://localhost:8984/rest/developing/" <> id = location
     {_, response} = Client.get(client, id)
 
     assert response.statements
@@ -68,19 +72,22 @@ defmodule ExFedoraClientTest do
 
   test "get an ID", %{client: client} do
     {_, %{headers: %{location: location}}} = Client.post(client, "")
-    "http://localhost:8984/rest/" <> id = location
+    "http://localhost:8984/rest/developing/" <> id = location
     {_, response} = Client.get(client, id)
 
     assert response.statements
     assert RDF.Graph.size(response.statements) == 13
   end
+
   setup do
-    client = %Client{url: "http://localhost:8984/rest", root: "dev"}
+    client = %Client{url: "http://localhost:8984/rest", root: "development"}
     {:ok, rooted_client: client}
   end
+
   test "working with a root path", %{rooted_client: client} do
     {_, response} = Client.post(client, "", :rdf_source, [])
     assert response.status_code == 201
-    assert "http://localhost:8984/rest/dev" <> _ = response.headers.location
+    assert "http://localhost:8984/rest/development/" <> id = response.headers.location
+    Client.delete(client, id)
   end
 end
