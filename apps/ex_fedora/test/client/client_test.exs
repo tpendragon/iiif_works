@@ -79,6 +79,15 @@ defmodule ExFedoraClientTest do
     assert response.statements
     assert RDF.Graph.size(response.statements) == 9
   end
+
+  test "rolling back a transaction", %{client: client} do
+    {_, %{headers: %{location: location}}} = Client.post(client, "")
+    id = ExFedora.Client.uri_to_id(client, location)
+    {:ok, _} = Client.get(client, id)
+
+    {:ok, new_client} = Client.rollback_transaction(client)
+    assert {:error, _} = Client.delete(new_client, id)
+  end
   test "committing a transaction", %{client: client} do
     {_, %{headers: %{location: location}}} = Client.post(client, "")
     id = ExFedora.Client.uri_to_id(client, location)
