@@ -6,39 +6,59 @@ defmodule ExFedora.Client do
 
   alias ExFedora.RestClient
   alias ExFedora.Client.Response
-  defstruct [:url]
+  defstruct [:url, root: ""]
 
-  def post(module, id, type \\ :rdf_source, body \\ []) do
+  def post(client, id, type \\ :rdf_source, body \\ []) do
     {result, response} =
       RestClient.post(
-        module.url <> "/" <> id,
+        id_to_url(client, id),
         serialize_body(type, body),
         headers(type)
       )
     process_response({result, response})
   end
 
-  def head(module, id) do
+  def id_to_url(client, "") do
+    root_url(client)
+  end
+
+  def id_to_url(client, "/" <> id) do
+    id_to_url(client, id)
+  end
+
+  def id_to_url(client, id) do
+    root_url(client) <> "/" <> id
+  end
+
+  defp root_url(client = %ExFedora.Client{root: ""}) do
+    client.url
+  end
+
+  defp root_url(client = %ExFedora.Client{root: binary}) when is_binary(binary) do
+    client.url <> "/" <> client.root
+  end
+
+  def head(client, id) do
     result = 
       RestClient.head(
-        module.url <> "/" <> id
+        id_to_url(client, id)
       )
     process_response(result)
   end
 
-  def put(module, id, type \\ :rdf_source, body \\ []) do
+  def put(client, id, type \\ :rdf_source, body \\ []) do
     result = 
       RestClient.put(
-        module.url <> "/" <> id,
+        id_to_url(client, id),
         serialize_body(type, body),
         headers(type)
       )
     process_response(result)
   end
 
-  def delete(module, id) do
+  def delete(client, id) do
     result = RestClient.delete(
-      module.url <> "/" <> id
+      id_to_url(client, id)
     )
     process_response(result)
   end
@@ -74,9 +94,9 @@ defmodule ExFedora.Client do
     []
   end
 
-  def get(module, id) do
+  def get(client, id) do
     {result, response} =
-      module.url <> "/" <> id
+      id_to_url(client, id)
       |> RestClient.get
       |> process_response
     case result do

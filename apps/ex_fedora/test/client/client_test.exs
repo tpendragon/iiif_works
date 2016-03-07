@@ -74,4 +74,13 @@ defmodule ExFedoraClientTest do
     assert response.statements
     assert RDF.Graph.size(response.statements) == 13
   end
+  setup do
+    client = %Client{url: "http://localhost:8984/rest", root: "dev"}
+    {:ok, rooted_client: client}
+  end
+  test "working with a root path", %{rooted_client: client} do
+    {_, response} = Client.post(client, "", :rdf_source, [])
+    assert response.status_code == 201
+    assert "http://localhost:8984/rest/dev" <> _ = response.headers.location
+  end
 end
