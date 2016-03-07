@@ -80,7 +80,7 @@ defmodule ExFedoraClientTest do
   end
 
   setup do
-    client = %Client{url: "http://localhost:8984/rest", root: "development"}
+    client = %Client{url: "http://localhost:8984/rest", root: "testing"}
     {:ok, rooted_client: client}
   end
 
