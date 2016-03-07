@@ -87,7 +87,7 @@ defmodule ExFedoraClientTest do
   test "working with a root path", %{rooted_client: client} do
     {_, response} = Client.post(client, "", :rdf_source, [])
     assert response.status_code == 201
-    assert "http://localhost:8984/rest/development/" <> id = response.headers.location
+    assert "http://localhost:8984/rest/testing/" <> id = response.headers.location
     Client.delete(client, id)
   end
 end
