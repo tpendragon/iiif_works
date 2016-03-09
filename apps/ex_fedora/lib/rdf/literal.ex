@@ -39,6 +39,7 @@ defmodule RDF.Literal do
   def dump(string) when is_binary(string) do
     {:ok, [%RDF.Literal{value: string}] }
   end
+  def dump(id = %{"@id" => _}), do: {:ok, [id]}
   def dump(_), do: :error
 
   def type, do: :literal

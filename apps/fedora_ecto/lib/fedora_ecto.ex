@@ -12,8 +12,9 @@ defmodule Fedora.Ecto do
   end
 
   def client(repo) do
-    %ExFedora.Client{url: Application.get_env(:ecto, repo)[:url], root:
-      Application.get_env(:ecto, repo)[:ldp_root]}
+    %ExFedora.Client{url:
+      "http://#{repo.config[:hostname]}:#{repo.config[:port]}/#{repo.config[:database]}", root:
+      repo.config[:ldp_root]}
   end
 
   def child_spec(repo, opts) do

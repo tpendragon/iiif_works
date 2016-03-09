@@ -11,9 +11,7 @@ config :logger, level: :warn
 
 # Configure your database
 config :iiif_works, IiifWorks.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "iiif_works_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  adapter: Fedora.Ecto,
+  url: "http://localhost:8984/rest",
+  ldp_root: "testing",
+  pool_size: 10

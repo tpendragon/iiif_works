@@ -34,9 +34,7 @@ config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
 config :iiif_works, IiifWorks.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "iiif_works_dev",
-  hostname: "localhost",
+  adapter: Fedora.Ecto,
+  url: "http://localhost:8984/rest",
+  ldp_root: "dev",
   pool_size: 10
