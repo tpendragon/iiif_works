@@ -25,8 +25,11 @@ defmodule ExFedora.Schema do
       Module.register_attribute(__MODULE__, :struct_fields, accumulate: true)
       Module.register_attribute(__MODULE__, :changeset_fields, accumulate: true)
       Module.put_attribute(__MODULE__, :struct_fields, {:unmapped_graph, %{}})
+      Module.put_attribute(__MODULE__, :struct_fields, {:uri, nil})
+      Module.put_attribute(__MODULE__, :ecto_fields, {:uri, RDF.URI})
       Module.put_attribute(__MODULE__, :ecto_fields, {:unmapped_graph, :map})
       Module.put_attribute(__MODULE__, :changeset_fields, {:unmapped_graph, :map})
+      Module.put_attribute(__MODULE__, :changeset_fields, {:uri, RDF.URI})
       Ecto.Schema.schema(unquote(name), do: unquote(block))
       predicates = @exfedora_predicates |> Enum.reverse
       Module.eval_quoted __ENV__, [

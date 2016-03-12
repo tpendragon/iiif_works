@@ -1,4 +1,3 @@
-require IEx
 defmodule RepoTest do
   use Ecto.Integration.Case
   alias Ecto.Integration.TestRepo
@@ -18,11 +17,15 @@ defmodule RepoTest do
     assert book.id == nil
     result = TestRepo.insert!(book)
     assert result.id
+    assert result.uri
 
     new_result = TestRepo.get!(Book, result.id)
     assert new_result.id == result.id
     assert new_result.title == ["test"]
+    assert new_result.uri == result.uri
     other_result = TestRepo.all(from(p in Book, where: p.id == ^new_result.id))
+    assert other_result == [new_result]
+    other_result = TestRepo.all(from(p in Book, where: p.uri == ^new_result.uri))
     assert other_result == [new_result]
   end
 

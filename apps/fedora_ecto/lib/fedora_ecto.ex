@@ -2,6 +2,7 @@ require IEx
 defmodule Fedora.Ecto do
   @behaviour Ecto.Adapter
   alias Fedora.Ecto.NormalizedQuery
+  alias ExFedora.Client
   defmacro __before_compile__(env) do
     quote do
     end
@@ -38,7 +39,7 @@ defmodule Fedora.Ecto do
   end
   def loaders(_, type), do: [type]
 
-  def insert(repo, schema_meta, fields, returning, options) do
+  def insert(repo, schema_meta, fields, [:id], options) do
     predicates = schema_meta.schema.__schema__(:predicates)
     transformed_graph = ExFedora.Model.to_graph(fields, predicates)
     combined_graph = RDF.Graph.merge(transformed_graph, fields[:unmapped_graph])
@@ -46,7 +47,7 @@ defmodule Fedora.Ecto do
     repo
     initialize(repo, root)
     pooled_command([:insert, client(repo), root, combined_graph])
-    |> process_result(returning, client(repo))
+    |> process_result([:id, :uri], client(repo))
   end
 
   def prepare(function, query) do
@@ -56,14 +57,15 @@ defmodule Fedora.Ecto do
   def execute(repo, meta, {cached, {:all, query}}, params, preprocess, opts) do
     client = client(repo)
     {root, struct} = query.from
-    params = List.first(params)
-    result = pooled_command([:query, client, params])
+    result = pooled_command([:query, client, query, params])
     case result do
       {:ok, output} ->
-        subject = ExFedora.Client.id_to_url(client, params)
-        result = ExFedora.Model.from_graph(struct, subject, output.statements)
-        result = Map.put(result, :id, String.replace_leading(result.id,
-        ExFedora.Client.id_to_url(client, "") <> "/", ""))
+        subject = ExFedora.Client.id_to_url(client, hd(params))
+        result =
+          struct
+          |> ExFedora.Model.from_graph(subject, output.statements)
+          |> Map.put(:id, hd(params))
+          |> Map.put(:uri, subject)
         {1, [[result]]}
       {:error, %{status_code: 404}} ->
         {0, []}
@@ -106,6 +108,10 @@ defmodule Fedora.Ecto do
     test_id = String.replace_leading(response.headers.location,
     ExFedora.Client.id_to_url(client, "") <> "/","")
     {:id, test_id}
+  end
+
+  defp process_result(:uri, {response, client}) do
+    {:uri, response.headers.location}
   end
 
   defp initialize(repo, root) do

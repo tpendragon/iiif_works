@@ -53,6 +53,7 @@ defmodule ExFedora.Client do
     client
   end
 
+  def id_to_url(client, result = "http" <> rest), do: result
   def id_to_url(client, ""), do: root_url(client)
   def id_to_url(client, "/" <> id), do: id_to_url(client, id)
   def id_to_url(client, id) do

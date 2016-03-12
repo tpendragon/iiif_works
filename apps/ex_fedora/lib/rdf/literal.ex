@@ -1,4 +1,3 @@
-require IEx
 defmodule RDF.Literal do
   @behaviour Ecto.Type
   defstruct [:value, :language]
