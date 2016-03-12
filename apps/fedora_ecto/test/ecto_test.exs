@@ -11,9 +11,7 @@ defmodule RepoTest do
 
   @tag timeout: 300000
   test "insert and get!" do
-    graph = %{:_type_ => :subject, "" => %{:_type_ => :predicate,
-      "http://predicate.com" => %RDF.Literal{value: "yo"}}}
-    book = %Book{title: ["test"], unmapped_graph: graph}
+    book = %Book{title: ["test"]}
     assert book.id == nil
     result = TestRepo.insert!(book)
     assert result.id
@@ -25,8 +23,8 @@ defmodule RepoTest do
     assert new_result.uri == result.uri
     other_result = TestRepo.all(from(p in Book, where: p.id == ^new_result.id))
     assert other_result == [new_result]
-    other_result = TestRepo.all(from(p in Book, where: p.uri == ^new_result.uri))
-    assert other_result == [new_result]
+    other_result = TestRepo.first(from(p in Book, where: p.uri == ^new_result.uri))
+    assert other_result.id == new_result.id
   end
 
   test "record doesn't exist" do

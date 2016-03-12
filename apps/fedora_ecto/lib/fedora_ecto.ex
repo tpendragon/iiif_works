@@ -64,7 +64,7 @@ defmodule Fedora.Ecto do
         result =
           struct
           |> ExFedora.Model.from_graph(subject, output.statements)
-          |> Map.put(:id, hd(params))
+          |> Map.put(:id, ExFedora.Client.uri_to_id(client, subject))
           |> Map.put(:uri, subject)
         {1, [[result]]}
       {:error, %{status_code: 404}} ->

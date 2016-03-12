@@ -13,13 +13,11 @@ defmodule FedoraObjectQueryTest do
   end
   test "when there is a work with a fileset" do
     client = Fedora.Ecto.client(Repo)
-    file_set = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#FileSet"}]}
-    file_set = Repo.insert!(file_set)
-    full_file_set_id = ExFedora.Client.id_to_url(client, file_set.id)
-    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => full_file_set_id}]})
-    full_proxy_id = ExFedora.Client.id_to_url(client, proxy.id)
+    file_set = Repo.insert!(%WorkNode{type: [%{"@id" =>
+          "http://pcdm.org/works#FileSet"}]})
+    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => file_set.uri}]})
     work_node = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}],
-      members: [%{"@id" => full_file_set_id}], first: [%{"@id" => full_proxy_id}]}
+      members: [%{"@id" => file_set.uri}], first: [%{"@id" => proxy.uri}]}
     work_node = Repo.insert!(work_node)
 
     reloaded_file_set = Repo.get!(WorkNode, file_set.id)
@@ -32,16 +30,12 @@ defmodule FedoraObjectQueryTest do
           "http://pcdm.org/works#FileSet"}]})
     file_set_2 = Repo.insert!(%WorkNode{type: [%{"@id" =>
           "http://pcdm.org/works#FileSet"}]})
-    full_file_set_id = ExFedora.Client.id_to_url(client, file_set.id)
-    full_file_set_id_2 = ExFedora.Client.id_to_url(client, file_set_2.id)
 
-    proxy_2 = Repo.insert!(%Proxy{proxy_for: [%{"@id" => full_file_set_id_2}]})
-    proxy_2_id = ExFedora.Client.id_to_url(client, proxy_2.id)
-    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => full_file_set_id}], next:
-      [%{"@id" => proxy_2_id}]})
-    full_proxy_id = ExFedora.Client.id_to_url(client, proxy.id)
+    proxy_2 = Repo.insert!(%Proxy{proxy_for: [%{"@id" => file_set_2.uri}]})
+    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => file_set.uri}], next:
+      [%{"@id" => proxy_2.uri}]})
     work_node = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}],
-      members: [%{"@id" => full_file_set_id}], first: [%{"@id" => full_proxy_id}]}
+      members: [%{"@id" => file_set.uri}], first: [%{"@id" => proxy.uri}]}
     work_node = Repo.insert!(work_node)
 
     reloaded_file_set = Repo.get!(WorkNode, file_set.id)
