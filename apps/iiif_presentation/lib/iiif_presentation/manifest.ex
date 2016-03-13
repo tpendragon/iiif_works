@@ -1,6 +1,8 @@
 defmodule IIIF.Presentation.Manifest do
+  alias IIIF.Presentation.Validations
   @default_context "http://iiif.io/api/presentation/2/context.json"
   @rdf_type "sc:Manifest"
+  @required_properties [:id, :type, :label]
   defstruct id: nil, canvases: [], context: @default_context, type: @rdf_type,
             label: nil, metadata: [], description: nil, thumbnail: nil,
             viewingHint: nil, viewingDirection:  nil, navDate: nil,
@@ -9,33 +11,7 @@ defmodule IIIF.Presentation.Manifest do
             sequences: []
 
   def valid?(manifest) do
-    cond do
-      !manifest.label ->
-        false
-      !manifest.id ->
-        false
-      !manifest.type ->
-        false
-      true ->
-        true
-    end
+    Validations.valid?(manifest, @required_properties)
   end
 
-  def to_json(manifest) do
-    manifest
-    |> Map.from_struct
-    |> Enum.map(&set_property/1)
-    |> Enum.filter(&filter_property/1)
-    |> Enum.into(%{})
-  end
-
-  defp set_property({:context, value}), do: {"@context", value}
-  defp set_property({:id, value}), do: {"@id", value}
-  defp set_property({:type, value}), do: {"@type", value}
-  defp set_property({_, nil}), do: nil
-  defp set_property(tuple), do: tuple
-
-  defp filter_property(nil), do: false
-  defp filter_property({_, []}), do: false
-  defp filter_property(_), do: true
 end
