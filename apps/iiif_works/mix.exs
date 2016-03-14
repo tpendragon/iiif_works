@@ -41,6 +41,7 @@ defmodule IiifWorks.Mixfile do
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
      {:fedora_ecto, in_umbrella: true},
+     {:iiif_presentation, in_umbrella: true},
      {:benchwarmer, "~> 0.0.2", only: [:dev, :test]}
      ]
   end

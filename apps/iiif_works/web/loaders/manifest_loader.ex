@@ -24,11 +24,12 @@ defmodule Iiif.Works.ManifestLoader do
     %Sequence{}
     |> Map.put(:canvases, canvases)
   end
-  defp from_fileset(%{height: height, width: width, id: id}, work_id) do
+  defp from_fileset(fs = %{height: height, width: width, id: id}, work_id) do
     %Canvas{}
     |> Map.put(:id, "#{work_id}/canvas/#{id}")
     |> Map.put(:height, height)
     |> Map.put(:width, width)
+    |> Map.put(:label, fs.label)
   end
 
 
@@ -39,5 +40,25 @@ defmodule Iiif.Works.ManifestLoader do
     |> Enum.map(fn(x) -> x["@id"] end)
     |> Enum.map(fn(x) -> x |>
          String.replace_leading("http://pcdm.org/works#","") end)
+    |> Enum.map(fn(x) -> x |>
+         String.replace_leading("http://projecthydra.org/works/models#","") end)
+    |> Enum.filter(&work_type?/1)
+  end
+
+  defp work_type?(type) do
+    case type do
+      "FileSet" ->
+        true
+      "Work" ->
+        true
+      "Collection" ->
+        true
+      "Range" ->
+        true
+      "TopRange" ->
+        true
+      _ ->
+        false
+    end
   end
 end
