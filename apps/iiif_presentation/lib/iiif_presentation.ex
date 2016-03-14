@@ -14,6 +14,7 @@ defmodule IIIF.Presentation do
   defp set_property(tuple), do: tuple
 
   defp filter_property(nil), do: false
+  defp filter_property({:sequences, _}), do: true
   defp filter_property({_, []}), do: false
   defp filter_property(_), do: true
 end

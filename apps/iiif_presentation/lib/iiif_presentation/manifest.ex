@@ -3,7 +3,7 @@ defmodule IIIF.Presentation.Manifest do
   @default_context "http://iiif.io/api/presentation/2/context.json"
   @rdf_type "sc:Manifest"
   @required_properties [:id, :type, :label]
-  defstruct id: nil, canvases: [], context: @default_context, type: @rdf_type,
+  defstruct id: nil, context: @default_context, type: @rdf_type,
             label: nil, metadata: [], description: nil, thumbnail: nil,
             viewingHint: nil, viewingDirection:  nil, navDate: nil,
             license: nil, attribution: nil, logo: nil, related: nil,
