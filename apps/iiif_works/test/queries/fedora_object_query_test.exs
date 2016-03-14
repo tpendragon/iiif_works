@@ -1,6 +1,5 @@
-require IEx
 defmodule FedoraObjectQueryTest do
-  use Iiif.Works.Integration.Case, async: true
+  use Iiif.Works.Integration.Case
   alias IiifWorks.Repo
 
   test "when there is one work" do

@@ -7,5 +7,7 @@ defmodule WorkNode do
     "http://pcdm.org/models#hasMember"
     property :first, predicate:
     "http://www.iana.org/assignments/relation/first"
+    field :height, :integer, virtual: true
+    field :width, :integer, virtual: true
   end
 end
