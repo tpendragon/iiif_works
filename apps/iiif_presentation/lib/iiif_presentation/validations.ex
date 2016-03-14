@@ -12,7 +12,12 @@ defmodule IIIF.Presentation.Validations do
       nil ->
         false
       [] ->
-        false
+        case property do
+          :canvases ->
+            true
+          _ ->
+            false
+        end
       _ ->
         true
     end

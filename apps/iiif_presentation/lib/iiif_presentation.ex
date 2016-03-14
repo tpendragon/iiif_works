@@ -15,6 +15,7 @@ defmodule IIIF.Presentation do
 
   defp filter_property(nil), do: false
   defp filter_property({:sequences, _}), do: true
+  defp filter_property({:canvases, _}), do: true
   defp filter_property({_, []}), do: false
   defp filter_property(_), do: true
 end
