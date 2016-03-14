@@ -3,6 +3,8 @@ defmodule IIIFPresentationTest do
   use ExUnit.Case
   doctest IIIF.Presentation
   alias IIIF.Presentation.Manifest
+  alias IIIF.Presentation.Sequence
+  alias IIIF.Presentation.Canvas
   setup do
     {:ok, manifest: %IIIF.Presentation.Manifest{}}
   end
@@ -58,5 +60,17 @@ defmodule IIIFPresentationTest do
     assert %{"@id" => _} = json_document
     assert %{"@context" => _} = json_document
     assert %{"@type" => _} = json_document
+  end
+
+  test "to_json for deep manifests" do
+    canvas = %Canvas{}
+    sequence = %Sequence{canvases: [canvas]}
+    manifest = %Manifest{sequences: [sequence]}
+
+    json_document = IIIF.Presentation.to_json(manifest)
+    first_sequence = Enum.at(json_document.sequences,0)
+    first_canvas = Enum.at(first_sequence.canvases,0)
+    assert first_canvas["@type"]
+    assert Map.has_key?(first_sequence, "@id") == false
   end
 end
