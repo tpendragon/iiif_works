@@ -1,15 +1,18 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
   alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader}
-  def from(work_node = %{ordered_members: members}, url_generator) do
-    from(work_node, url_generator, loader(members))
-    |> apply_view_data(work_node)
+  def from(work_node = %{ordered_members: members},
+           url_generator,
+           loader_finder \\ &loader/1
+           ) when is_function(loader_finder) do
+    from(work_node, url_generator, loader_finder.(members))
   end
-  defp from(work = %{id: id}, url_generator, loader) do
+  def from(work = %{id: id}, url_generator, loader) do
     url = url_generator.(id)
     loader.generate()
     |> Map.put(:id, url)
     |> loader.load(work, url_generator)
+    |> apply_view_data(work)
   end
 
   defp loader(members) do
