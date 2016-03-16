@@ -1,15 +1,11 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
   alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader}
-  def from(work_node, url_generator, loader_finder \\ &loader/1)
-  def from(work_node, url_generator, loader_finder) when is_function(loader_finder) do
-    from(work_node, url_generator, loader_finder.(work_node))
-  end
-  def from(work = %{id: id}, url_generator, loader) do
+  def from(work = %{id: id}, url_generator, loader \\ &loader/2) do
     url = url_generator.(id)
-    loader.generate()
+    work
+    |> loader.(url_generator)
     |> Map.put(:id, url)
-    |> loader.load(work, url_generator)
     |> apply_view_data(work)
   end
 
@@ -25,8 +21,8 @@ defmodule Iiif.Works.ManifestLoader do
         nil
     end
   end
-  defp loader(%{ordered_members: members}) do
-    loader(members)
+  defp loader(work = %{ordered_members: members}, id_generator) do
+    loader(members).load(work, id_generator)
   end
 
   defp apply_view_data(manifest = %{}, %{label: label, description: description}) do
