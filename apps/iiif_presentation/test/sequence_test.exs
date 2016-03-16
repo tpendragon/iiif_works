@@ -1,4 +1,3 @@
-require IEx
 defmodule SequenceTest do
   use ExUnit.Case
   doctest IIIF.Presentation
