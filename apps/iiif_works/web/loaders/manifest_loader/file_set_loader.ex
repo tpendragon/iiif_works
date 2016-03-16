@@ -1,8 +1,5 @@
 defmodule Iiif.Works.ManifestLoader.FileSetLoader do
-  alias IIIF.Presentation.Collection
-  alias IIIF.Presentation.Manifest
-  alias IIIF.Presentation.Sequence
-  alias IIIF.Presentation.Canvas
+  alias IIIF.Presentation.{Sequence, Canvas, Manifest}
   def load(manifest = %{id: id}, %{ordered_members: members}, _) when is_list(members) do
     canvases = members |> Enum.map(&build_canvas(&1, id))
     sequence = %Sequence{} |> Map.put(:canvases, canvases)

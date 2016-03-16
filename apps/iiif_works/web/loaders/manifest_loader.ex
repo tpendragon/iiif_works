@@ -1,8 +1,6 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
-  alias Iiif.Works.ManifestLoader.FileSetLoader
-  alias Iiif.Works.ManifestLoader.WorkLoader
-  alias Iiif.Works.ManifestLoader.NullLoader
+  alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader}
   def from(work_node = %{ordered_members: members}, url_generator) do
     from(work_node, url_generator, loader(members))
     |> apply_view_data(work_node)
