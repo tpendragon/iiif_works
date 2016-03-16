@@ -1,11 +1,9 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
   alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader}
-  def from(work_node = %{ordered_members: members},
-           url_generator,
-           loader_finder \\ &loader/1
-           ) when is_function(loader_finder) do
-    from(work_node, url_generator, loader_finder.(members))
+  def from(work_node, url_generator, loader_finder \\ &loader/1)
+  def from(work_node, url_generator, loader_finder) when is_function(loader_finder) do
+    from(work_node, url_generator, loader_finder.(work_node))
   end
   def from(work = %{id: id}, url_generator, loader) do
     url = url_generator.(id)
@@ -15,7 +13,7 @@ defmodule Iiif.Works.ManifestLoader do
     |> apply_view_data(work)
   end
 
-  defp loader(members) do
+  defp loader(members) when is_list(members) do
     case types(members) do
       ["FileSet"] ->
         FileSetLoader
@@ -26,6 +24,9 @@ defmodule Iiif.Works.ManifestLoader do
       _ ->
         nil
     end
+  end
+  defp loader(%{ordered_members: members}) do
+    loader(members)
   end
 
   defp apply_view_data(manifest = %{}, %{label: label, description: description}) do
