@@ -1,5 +1,8 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
+  alias Iiif.Works.ManifestLoader.FileSetLoader
+  alias Iiif.Works.ManifestLoader.WorkLoader
+  alias Iiif.Works.ManifestLoader.NullLoader
   def from(work_node = %{ordered_members: members}, url_generator) do
     from(work_node, url_generator, loader(members))
     |> apply_view_data(work_node)
@@ -14,11 +17,11 @@ defmodule Iiif.Works.ManifestLoader do
   defp loader(members) do
     case types(members) do
       ["FileSet"] ->
-        Iiif.Works.ManifestLoader.FileSetLoader
+        FileSetLoader
       ["Work"] ->
-        Iiif.Works.ManifestLoader.WorkLoader
+        WorkLoader
       [] ->
-        Iiif.Works.ManifestLoader.NullLoader
+        NullLoader
       _ ->
         nil
     end
