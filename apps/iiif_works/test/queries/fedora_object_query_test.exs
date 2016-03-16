@@ -40,4 +40,18 @@ defmodule FedoraObjectQueryTest do
     query_result = FedoraObjectQuery.from_id(Repo, WorkNode, work_node.id)
     assert [^reloaded_file_set,^reloaded_file_set2] = query_result.ordered_members
   end
+  test "when there is a work with a work" do
+    work = Repo.insert!(%WorkNode{
+      type: [%{"@id" => "http://pcdm.org/works#Work"}]
+    })
+    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => work.uri}]})
+    work_node = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}],
+      members: [%{"@id" => work.uri}], first: [%{"@id" => proxy.uri}]}
+    work_node = Repo.insert!(work_node)
+
+    reloaded_work = Repo.get!(WorkNode, work.id)
+    query_result = FedoraObjectQuery.from_id(Repo, WorkNode, work_node.id)
+
+    assert [^reloaded_work] = query_result.ordered_members
+  end
 end
