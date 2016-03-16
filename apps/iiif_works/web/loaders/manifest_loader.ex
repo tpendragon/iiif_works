@@ -8,19 +8,15 @@ defmodule Iiif.Works.ManifestLoader do
   end
   # Only file sets - generate canvases
   defp from(%{ordered_members: members, id: id}, ["FileSet"], url_generator) do
-    manifest = 
-      %Manifest{}
-      |> Map.put(:id, url_generator.(id))
-    manifest = 
-      manifest
-      |> Map.put(:sequences, [from_fileset(members, manifest.id)])
+    url = url_generator.(id)
+    %Manifest{}
+    |> Map.put(:id, url)
+    |> Map.put(:sequences, [from_fileset(members, url)])
   end
 
 
   defp from_fileset(canvases, id) when is_list(canvases) do
-    canvases = 
-      canvases
-      |> Enum.map(&from_fileset(&1, id))
+    canvases = canvases |> Enum.map(&from_fileset(&1, id))
     %Sequence{}
     |> Map.put(:canvases, canvases)
   end
@@ -38,11 +34,14 @@ defmodule Iiif.Works.ManifestLoader do
     |> Enum.flat_map(fn(x) -> x.type end)
     |> Enum.uniq
     |> Enum.map(fn(x) -> x["@id"] end)
-    |> Enum.map(fn(x) -> x |>
-         String.replace_leading("http://pcdm.org/works#","") end)
-    |> Enum.map(fn(x) -> x |>
-         String.replace_leading("http://projecthydra.org/works/models#","") end)
+    |> Enum.map(&strip_works_namespace/1)
     |> Enum.filter(&work_type?/1)
+  end
+
+  defp strip_works_namespace(uri) do
+    uri
+    |> String.replace_leading("http://pcdm.org/works#","")
+    |> String.replace_leading("http://projecthydra.org/works/models#","")
   end
 
   defp work_type?(type) do
