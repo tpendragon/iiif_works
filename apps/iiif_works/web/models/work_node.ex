@@ -9,6 +9,8 @@ defmodule WorkNode do
       "http://www.iana.org/assignments/relation/first"
     property :label, predicate:
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#label"
+    property :description, predicate:
+      "http://purl.org/dc/terms/description"
     field :height, :integer, virtual: true
     field :width, :integer, virtual: true
   end

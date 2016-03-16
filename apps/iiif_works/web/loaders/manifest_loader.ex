@@ -1,10 +1,18 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
+  alias IIIF.Presentation.Collection
   alias IIIF.Presentation.Manifest
   alias IIIF.Presentation.Sequence
   alias IIIF.Presentation.Canvas
   def from(work_node = %{ordered_members: members}, url_generator) do
     from(work_node, types(members), url_generator)
+    |> apply_view_data(work_node)
+  end
+  # No children - generate an empty manifest.
+  defp from(%{id: id}, [], url_generator) do
+    url = url_generator.(id)
+    %Manifest{}
+    |> Map.put(:id, url)
   end
   # Only file sets - generate canvases
   defp from(%{ordered_members: members, id: id}, ["FileSet"], url_generator) do
@@ -13,7 +21,32 @@ defmodule Iiif.Works.ManifestLoader do
     |> Map.put(:id, url)
     |> Map.put(:sequences, [from_fileset(members, url)])
   end
+  # Only works - generate collection
+  defp from(%{ordered_members: members, id: id}, ["Work"], url_generator) do
+    url = url_generator.(id)
+    %Collection{}
+    |> Map.put(:id, url)
+    |> Map.put(:manifests, from_works(members, url_generator))
+  end
 
+  defp apply_view_data(manifest = %{}, work = %{label: label, description: description}) do
+    manifest
+    |> Map.put(:label, label)
+    |> Map.put(:description, description)
+  end
+
+  defp from_works(works, id_generator) when is_list(works) do
+    works |> Enum.map(&from_works(&1, id_generator))
+  end
+  defp from_works(work = %{id: id, ordered_members: _}, id_generator) do
+    work
+    |> from(id_generator)
+  end
+  defp from_works(work = %{id: id}, id_generator) do
+    work
+    |> Map.put(:ordered_members, [])
+    |> from(id_generator)
+  end
 
   defp from_fileset(canvases, id) when is_list(canvases) do
     canvases = canvases |> Enum.map(&from_fileset(&1, id))
