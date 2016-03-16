@@ -2,7 +2,6 @@ require IEx
 defmodule ManifestLoaderTest do
   use Iiif.Works.Integration.Case, async: true
   alias Iiif.Works.ManifestLoader
-  alias IiifWorks.Repo
   alias IIIF.Presentation.Manifest
 
   test "loading a work with two filesets" do

@@ -12,24 +12,16 @@ defmodule FedoraObjectQuery do
       |> ordered_proxies(work_node)
       |> Enum.map(&Task.async(fn -> proxy_for(repo, work_node.__struct__, &1) end))
       |> Enum.map(&Task.await/1)
-    types = 
-      ordered_members
-      |> Enum.flat_map(fn(x) -> x.type end)
-      |> Enum.filter(fn(x) -> String.starts_with?(x["@id"], "http://pcdm.org") end)
     Map.merge(work_node, %{ordered_members: ordered_members})
   end
 
-  defp ordered_proxies(_, work_node = %{first: nil}) do
-    []
-  end
+  defp ordered_proxies(_, %{first: nil}), do: []
   defp ordered_proxies(repo, proxy = %Proxy{next: [%{"@id" => next_id}]}) do
     next_proxy = repo.get!(Proxy, url_to_id(repo, next_id))
     [proxy | ordered_proxies(repo, next_proxy)]
   end
-  defp ordered_proxies(repo, proxy = %Proxy{}) do
-    [proxy]
-  end
-  defp ordered_proxies(repo, work_node = %{first: [%{"@id" => first_uri}]}) do
+  defp ordered_proxies(_, proxy = %Proxy{}), do: [proxy]
+  defp ordered_proxies(repo, %{first: [%{"@id" => first_uri}]}) do
     proxy = repo.get!(Proxy, url_to_id(repo, first_uri))
     ordered_proxies(repo, proxy)
   end

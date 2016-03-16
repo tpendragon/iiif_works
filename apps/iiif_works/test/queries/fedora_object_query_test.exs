@@ -5,13 +5,12 @@ defmodule FedoraObjectQueryTest do
   test "when there is one work" do
     work_node = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}]}
     result = Repo.insert!(work_node)
-    new_result = Repo.get!(WorkNode, result.id)
+    Repo.get!(WorkNode, result.id)
 
     assert FedoraObjectQuery.from_id(Repo, WorkNode, result.id).ordered_members
     == []
   end
   test "when there is a work with a fileset" do
-    client = Fedora.Ecto.client(Repo)
     file_set = Repo.insert!(%WorkNode{type: [%{"@id" =>
           "http://pcdm.org/works#FileSet"}]})
     proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => file_set.uri}]})
@@ -24,7 +23,6 @@ defmodule FedoraObjectQueryTest do
     assert %{ordered_members: [^reloaded_file_set]} = query_result
   end
   test "when there is two filesets" do
-    client = Fedora.Ecto.client(Repo)
     file_set = Repo.insert!(%WorkNode{type: [%{"@id" =>
           "http://pcdm.org/works#FileSet"}]})
     file_set_2 = Repo.insert!(%WorkNode{type: [%{"@id" =>
