@@ -14,9 +14,8 @@ defmodule IiifWorks.Router do
   end
 
   scope "/", IiifWorks do
-    pipe_through :browser # Use the default browser stack
-
-    get "/", PageController, :index
+    pipe_through :api
+    get "/*id", ManifestController, :show
   end
 
   # Other scopes may use custom stacks.

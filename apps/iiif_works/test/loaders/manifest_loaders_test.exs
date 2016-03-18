@@ -51,8 +51,8 @@ defmodule ManifestLoaderTest do
       id: id,
       type: [ %{"@id" => "http://pcdm.org/works#FileSet"}],
       label: "A File",
-      height: 0,
-      width: 0
+      height: ["0"],
+      width: ["0"]
     }
   end
 end
