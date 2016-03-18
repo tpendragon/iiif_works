@@ -35,5 +35,6 @@ defmodule IiifWorks.Endpoint do
     key: "_iiif_works_key",
     signing_salt: "moEarcDb"
 
+  plug PlugCors, origins: ["*"]
   plug IiifWorks.Router
 end

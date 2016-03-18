@@ -1,6 +1,6 @@
 require IEx
 defmodule Iiif.Works.ManifestLoader do
-  alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader}
+  alias Iiif.Works.ManifestLoader.{FileSetLoader, WorkLoader, NullLoader, ImageLoader}
   def from(work = %{id: id}, url_generator, loader \\ &loader/2) do
     url = url_generator.(id)
     work
@@ -12,22 +12,26 @@ defmodule Iiif.Works.ManifestLoader do
   defp loader(members) when is_list(members) do
     case types(members) do
       ["FileSet"] ->
-        FileSetLoader
+        &FileSetLoader.load(&1, &2, image_loader)
       ["Work"] ->
-        WorkLoader
+        &WorkLoader.load/2
       [] ->
-        NullLoader
+        &NullLoader.load/2
       _ ->
         nil
     end
   end
   defp loader(work = %{ordered_members: members}, id_generator) do
-    loader(members).load(work, id_generator)
+    loader(members).(work, id_generator)
   end
 
-  defp apply_view_data(manifest = %{}, %{label: label, description: description}) do
+  defp image_loader do
+    &ImageLoader.load(&1, &2, IIIFPaths)
+  end
+
+  defp apply_view_data(manifest = %{}, work = %{description: description}) do
     manifest
-    |> Map.put(:label, label)
+    |> Map.put(:label, label_or_title(work))
     |> Map.put(:description, description)
   end
 
@@ -62,4 +66,10 @@ defmodule Iiif.Works.ManifestLoader do
         false
     end
   end
+
+  def label_or_title(%{label: label, title: title}) do
+    label_or_title(label || title)
+  end
+  def label_or_title(nil), do: nil
+  def label_or_title([label]), do: label
 end
