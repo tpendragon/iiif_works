@@ -5,7 +5,7 @@ defmodule CollectionTest do
   setup do
     {:ok, manifest: %Collection{}}
   end
-  test "Canvas struct", %{manifest: manifest} do
+  test "Collection struct", %{manifest: manifest} do
     assert manifest.context == "http://iiif.io/api/presentation/2/context.json"
     # Descriptive and Rights Properties
     assert manifest.label == nil
