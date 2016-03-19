@@ -24,12 +24,12 @@ defmodule IiifWorks.ManifestController do
   end
   defp handle_id(conn, _), do: conn
   defp handle_id(id) when is_binary(id), do: id
-  defp handle_id(id) when length(id) == 1, do: id |> expand_noid
+  defp handle_id(id) when length(id) == 1, do: Enum.at(id, 0)
   defp handle_id(id) when is_list(id), do: id |> Enum.join("/")
 
   defp load_manifest(conn, id) do
-    Repo
-    |> FedoraObjectQuery.from_id(WorkNode, id)
+    WorkNode
+    |> SolrWorksQuery.from_id(id)
     |> ManifestLoader.from(&manifest_url(conn, :show, String.split(compact_noid(&1), "/")))
   end
 

@@ -23,7 +23,7 @@ defmodule IiifWorks.Mixfile do
   def application do
     [mod: {IiifWorks, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :fedora_ecto]]
+                    :phoenix_ecto, :fedora_ecto, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -43,7 +43,9 @@ defmodule IiifWorks.Mixfile do
      {:fedora_ecto, in_umbrella: true},
      {:iiif_presentation, in_umbrella: true},
      {:benchwarmer, "~> 0.0.2", only: [:dev, :test]},
-     {:plug_cors, "~> 0.7.3"}
+     {:plug_cors, "~> 0.7.3"},
+     {:exprof, "~> 0.2.0"},
+     {:httpoison, "~> 0.8.0"}
      ]
   end
 

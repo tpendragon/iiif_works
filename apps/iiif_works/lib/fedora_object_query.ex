@@ -7,23 +7,43 @@ defmodule FedoraObjectQuery do
   end
 
   defp load_ordered_members(work_node, repo) do
+    :ets.new(:subject_cache, [:named_table])
     ordered_members = 
       repo
       |> ordered_proxies(work_node)
       |> Enum.map(&Task.async(fn -> proxy_for(repo, work_node.__struct__, &1) end))
       |> Enum.map(&Task.await/1)
+    :ets.delete(:subject_cache)
     Map.merge(work_node, %{ordered_members: ordered_members})
   end
 
   defp ordered_proxies(_, %{first: nil}), do: []
   defp ordered_proxies(repo, proxy = %Proxy{next: [%{"@id" => next_id}]}) do
-    next_proxy = repo.get!(Proxy, url_to_id(repo, next_id))
+    next_proxy = cached_get(repo, Proxy, next_id)
     [proxy | ordered_proxies(repo, next_proxy)]
   end
   defp ordered_proxies(_, proxy = %Proxy{}), do: [proxy]
   defp ordered_proxies(repo, %{first: [%{"@id" => first_uri}]}) do
-    proxy = repo.get!(Proxy, url_to_id(repo, first_uri))
+    proxy = cached_get(repo, Proxy, first_uri)
     ordered_proxies(repo, proxy)
+  end
+
+  defp cached_get(repo, struct, next_id) do
+    cache_subject = next_id |> String.split("#") |> Enum.at(0)
+    case :ets.lookup(:subject_cache, cache_subject) do
+      [{^cache_subject, graph}] ->
+        ExFedora.Model.from_graph(Proxy, next_id, graph)
+        |> Map.put(:id, ExFedora.Client.uri_to_id(Fedora.Ecto.client(repo), next_id))
+        |> Map.put(:uri, next_id)
+      [] ->
+        {:ok, %{statements: graph}} = ExFedora.Client.get(Fedora.Ecto.client(repo), next_id)
+        new_proxy = 
+        ExFedora.Model.from_graph(Proxy, next_id, graph)
+        |> Map.put(:id, ExFedora.Client.uri_to_id(Fedora.Ecto.client(repo), next_id))
+        |> Map.put(:uri, next_id)
+        :ets.insert(:subject_cache, {cache_subject, graph})
+        new_proxy
+    end
   end
 
   defp proxy_for(_, _, %{proxy_for: nil}), do: nil
