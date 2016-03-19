@@ -12,7 +12,8 @@ config :iiif_works, IiifWorks.Endpoint,
   secret_key_base: "PtEEvRQYXRzFcW0xB+ixS6WsrjKYjPijuYcSNaJfu8DeEU8ZmalA7bv2MVWCxLnU",
   render_errors: [accepts: ~w(html json)],
   pubsub: [name: IiifWorks.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+  solr_url: "http://localhost:8983/solr/hydra-development/select"
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -55,7 +55,7 @@ defmodule SolrWorksQuery do
   end
 
   defp solr_query(query, opts \\ %{}) do
-    HTTPoison.get("http://localhost:8983/solr/hydra-development/select", [], 
+    HTTPoison.get(solr_url, [], 
       params: Enum.into(%{
         q: query,
         wt: "json",
@@ -67,5 +67,9 @@ defmodule SolrWorksQuery do
     |> elem(1)
     |> Poison.decode!
     |> get_in(["response","docs"])
+  end
+
+  defp solr_url do
+    Application.get_env(:iiif_works, IiifWorks.Endpoint)[:solr_url]
   end
 end
