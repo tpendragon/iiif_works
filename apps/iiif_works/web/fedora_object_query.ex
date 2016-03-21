@@ -10,6 +10,7 @@ defmodule FedoraObjectQuery do
     ordered_members = 
       repo
       |> ordered_proxies(work_node)
+      # |> Enum.map(&proxy_for(repo, work_node.__struct__, &1))
       |> Enum.map(&Task.async(fn -> proxy_for(repo, work_node.__struct__, &1) end))
       |> Enum.map(&Task.await/1)
     Map.merge(work_node, %{ordered_members: ordered_members})

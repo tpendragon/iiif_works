@@ -1,6 +1,6 @@
 require IEx
 defmodule SolrWorksQuery do
-  def from_id(work_node, id) do
+  def from_id(_repo, work_node, id) do
     doc = solr_document(id)
     ordered_ids = ordered_ids(id)
     all_docs = solr_document(ordered_ids)
