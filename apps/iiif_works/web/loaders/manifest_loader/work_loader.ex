@@ -1,6 +1,6 @@
 defmodule Iiif.Works.ManifestLoader.WorkLoader do
   alias IIIF.Presentation.Collection
-  def load(%{ordered_members: members}, id_generator) when is_list(members) do
+  def load(work = %{ordered_members: members}, id_generator) when is_list(members) do
     manifests = members |> Enum.map(&build_manifest(&1, id_generator))
     %Collection{}
     |> Map.put(:manifests, manifests)

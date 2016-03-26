@@ -37,4 +37,4 @@ config :iiif_works, IiifWorks.Repo,
   adapter: Fedora.Ecto,
   url: "http://localhost:8984/rest",
   ldp_root: "dev",
-  pool_size: 10
+  pool_size: 1

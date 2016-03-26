@@ -5,11 +5,15 @@ defmodule ManifestLoaderTest do
   alias IIIF.Presentation.Manifest
   alias IIIF.Presentation.Collection
 
-  test "loading a work with two filesets" do
+  test "loading a work with two parts that have filesets" do
     work = build_work("test")
+    part1 = build_work("part1")
+    part2 = build_work("part2")
     fs1 = build_file_set("123456789")
     fs2 = build_file_set("012345678")
-    work = Map.put(work, :ordered_members, [fs1, fs2])
+    part1 = Map.put(part1, :members, [fs1])
+    part2 = Map.put(part2, :members, [fs2])
+    work = Map.put(work, :ordered_members, [part1, part2])
 
     manifest = ManifestLoader.from(work, fn(x) -> "http://bla.org/#{x}" end)
     assert %Manifest{} = manifest

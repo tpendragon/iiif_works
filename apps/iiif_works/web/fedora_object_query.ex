@@ -10,7 +10,6 @@ defmodule FedoraObjectQuery do
     ordered_members = 
       repo
       |> ordered_proxies(work_node)
-      # |> Enum.map(&proxy_for(repo, work_node.__struct__, &1))
       |> Enum.map(&Task.async(fn -> proxy_for(repo, work_node.__struct__, &1) end))
       |> Enum.map(&Task.await/1)
     Map.merge(work_node, %{ordered_members: ordered_members})
@@ -47,7 +46,20 @@ defmodule FedoraObjectQuery do
 
   defp proxy_for(_, _, %{proxy_for: nil}), do: nil
   defp proxy_for(repo, work_node, %{proxy_for: [%{"@id" => proxy_for}]}) do
-    repo.get!(work_node, url_to_id(repo, proxy_for))
+    result = repo.get!(work_node, url_to_id(repo, proxy_for))
+    load_members(repo, work_node, result)
+  end
+
+  defp load_members(_, _, r = %{members: nil}), do: r
+  defp load_members(repo, work_node, r = %{members: members}) do
+    members =
+      members
+      |> Enum.map(&Task.async(fn -> load_member(repo, work_node, &1) end))
+      |> Enum.map(&Task.await/1)
+    %{r | members: members}
+  end
+  defp load_member(repo, work_node, %{"@id" => uri}) do
+    repo.get!(work_node, url_to_id(repo, uri))
   end
 
   defp url_to_id(repo, url) do
