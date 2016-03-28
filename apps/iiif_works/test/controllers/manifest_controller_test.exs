@@ -18,9 +18,12 @@ defmodule ManifestControllerTest do
   defp create_work_node do
     file_set = Repo.insert!(%WorkNode{type: [%{"@id" =>
           "http://pcdm.org/works#FileSet"}], width: "100", height: "100"})
-    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => file_set.uri}]})
+    part = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}],
+      members: [%{"@id" => file_set.uri}]}
+    part = Repo.insert!(part)
+    proxy = Repo.insert!(%Proxy{proxy_for: [%{"@id" => part.uri}]})
     work_node = %WorkNode{type: [%{"@id" => "http://pcdm.org/works#Work"}],
-      members: [%{"@id" => file_set.uri}], first: [%{"@id" => proxy.uri}]}
+      members: [%{"@id" => part.uri}], first: [%{"@id" => proxy.uri}]}
     Repo.insert!(work_node)
   end
 end

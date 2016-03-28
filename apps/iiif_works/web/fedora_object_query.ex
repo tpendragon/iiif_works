@@ -3,16 +3,25 @@ defmodule FedoraObjectQuery do
   def from_id(repo, work_node, id) do
     work_node
     |> repo.get!(id)
-    |> load_ordered_members(repo)
+    |> preload_proxies(repo)
+    |> extract_ordered_members(repo)
   end
 
-  defp load_ordered_members(work_node, repo) do
-    ordered_members = 
+  defp preload_proxies(work_node, repo) do
+    proxies = 
       repo
       |> ordered_proxies(work_node)
-      |> Enum.map(&Task.async(fn -> proxy_for(repo, work_node.__struct__, &1) end))
+      |> Enum.map(&Task.async(fn -> preload_proxy_for(repo, work_node.__struct__, &1) end))
       |> Enum.map(&Task.await/1)
-    Map.merge(work_node, %{ordered_members: ordered_members})
+    Map.put(work_node, :proxies, proxies)
+  end
+
+  defp extract_ordered_members(work_node = %{proxies: proxies}, repo) do
+    ordered_members =
+      proxies
+      |> Enum.flat_map(fn(proxy) -> proxy.proxy_for end)
+      |> Enum.map(fn(member) -> load_members(repo, work_node.__struct__, member) end)
+    Map.put(work_node, :ordered_members, ordered_members)
   end
 
   defp ordered_proxies(_, %{first: nil}), do: []
@@ -32,22 +41,22 @@ defmodule FedoraObjectQuery do
       nil ->
         {:ok, %{statements: graph}} = ExFedora.Client.get(Fedora.Ecto.client(repo), next_id)
         new_proxy = 
-        ExFedora.Model.from_graph(Proxy, next_id, graph)
+        ExFedora.Model.from_graph(struct, next_id, graph)
         |> Map.put(:id, ExFedora.Client.uri_to_id(Fedora.Ecto.client(repo), next_id))
         |> Map.put(:uri, next_id)
         Process.put(cache_subject, graph)
         new_proxy
       graph ->
-        ExFedora.Model.from_graph(Proxy, next_id, graph)
+        ExFedora.Model.from_graph(struct, next_id, graph)
         |> Map.put(:id, ExFedora.Client.uri_to_id(Fedora.Ecto.client(repo), next_id))
         |> Map.put(:uri, next_id)
     end
   end
 
-  defp proxy_for(_, _, %{proxy_for: nil}), do: nil
-  defp proxy_for(repo, work_node, %{proxy_for: [%{"@id" => proxy_for}]}) do
+  defp preload_proxy_for(_, _, proxy = %{proxy_for: nil}), do: proxy
+  defp preload_proxy_for(repo, work_node, proxy = %{proxy_for: [%{"@id" => proxy_for}]}) do
     result = repo.get!(work_node, url_to_id(repo, proxy_for))
-    load_members(repo, work_node, result)
+    %{proxy | proxy_for: [result]}
   end
 
   defp load_members(_, _, r = %{members: nil}), do: r

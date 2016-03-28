@@ -1,5 +1,5 @@
 require IEx
-defmodule Iiif.Works.ManifestLoader.FileSetLoader do
+defmodule Iiif.Works.ManifestLoader.PartLoader do
   alias IIIF.Presentation.{Sequence, Canvas, Manifest}
   import Iiif.Works.ManifestLoader, only: [label_or_title: 1]
   def load(%{id: work_id, ordered_members: members}, id_generator, image_loader, width_extractor \\ &works_width_height/2) when is_list(members) do
@@ -10,7 +10,7 @@ defmodule Iiif.Works.ManifestLoader.FileSetLoader do
     |> Map.put(:sequences, [sequence])
   end
 
-  defp build_canvas(fs = %{height: height, width: width, id: id}, work_id, image_loader, width_height_extractor) do
+  defp build_canvas(fs = %{id: id}, work_id, image_loader, width_height_extractor) do
     %Canvas{}
     |> Map.put(:id, "#{work_id}/canvas/#{id}")
     |> Map.put(:label, label_or_title(fs))

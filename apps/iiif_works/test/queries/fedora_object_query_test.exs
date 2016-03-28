@@ -23,6 +23,7 @@ defmodule FedoraObjectQueryTest do
 
     reloaded_file_set = Repo.get!(WorkNode, file_set.id)
     query_result = FedoraObjectQuery.from_id(Repo, WorkNode, work_node.id)
+    assert %{proxies: [%{proxy_for: [_part]}]} = query_result
     assert %{ordered_members: [%{members: [^reloaded_file_set]}]} = query_result
   end
   test "when there is two parts" do
